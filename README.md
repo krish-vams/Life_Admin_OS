@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The first phase is a full-stack authentication foundation. Users can register, log in, receive a JWT, and access a protected dashboard backed by PostgreSQL.
+The application currently supports authentication plus manual bill and subscription tracking. Users can register, log in, manage recurring payments, and view a protected dashboard backed by PostgreSQL.
 
 ## Current Phase
 
-Phase 1: Project Foundation
+Phase 2: Manual Bills and Subscription Tracking
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -14,6 +14,9 @@ Phase 1: Project Foundation
 - Password hashing with bcrypt.
 - JWT authentication.
 - Basic user profile on the dashboard.
+- User-scoped bill CRUD.
+- User-scoped subscription CRUD.
+- Dashboard summaries for open bills, subscription spend, due bills, and upcoming renewals.
 
 ## Run Locally
 
@@ -62,6 +65,16 @@ http://localhost:5173
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/user/profile`
+- `POST /api/bills`
+- `GET /api/bills`
+- `GET /api/bills/:id`
+- `PUT /api/bills/:id`
+- `DELETE /api/bills/:id`
+- `POST /api/subscriptions`
+- `GET /api/subscriptions`
+- `GET /api/subscriptions/:id`
+- `PUT /api/subscriptions/:id`
+- `DELETE /api/subscriptions/:id`
 
 ## Project Docs
 

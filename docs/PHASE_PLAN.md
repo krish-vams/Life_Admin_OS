@@ -22,23 +22,27 @@ Success criteria:
 - A logged-out user is redirected to login.
 - The backend exposes `POST /api/auth/register`, `POST /api/auth/login`, and `GET /api/user/profile`.
 
-## Phase 2: Core Life Admin Data
+## Phase 2: Manual Bills and Subscription Tracking
 
-Goal: Add the first real life-admin records after authentication is stable.
+Goal: Allow users to manually add and manage bills and subscriptions.
 
 Scope:
 
-- Database schema for bills, subscriptions, documents, reminders, and notification preferences.
-- API endpoints for CRUD operations on each module.
-- Dashboard overview with upcoming bills, renewals, expirations, and reminders.
-- Monthly recurring expense summary.
-- Server-side validation.
+- Bills with name, amount, due date, category, status, and notes.
+- Bill create, read, update, and delete APIs.
+- Subscriptions with name, amount, billing cycle, renewal date, category, status, and notes.
+- Subscription create, read, update, and delete APIs.
+- Subscription statuses: active, paused, and cancelled.
+- User-scoped database tables for bills and subscriptions.
+- Dashboard summaries for open bill total, estimated monthly subscription total, due-soon bills, and upcoming renewals.
 
 Success criteria:
 
-- A logged-in user can add, edit, delete, and view life-admin items.
+- A logged-in user can add, edit, delete, and view bills.
+- A logged-in user can add, edit, delete, and view subscriptions.
 - Records are scoped to the authenticated user.
-- The dashboard highlights what is due soon.
+- The dashboard highlights bills due in the next 14 days.
+- The dashboard highlights subscription renewals in the next 30 days.
 
 ## Phase 3: Smart Reminders
 

@@ -1,0 +1,176 @@
+import express from "express";
+import { query } from "../config/db.js";
+import { requireAuth } from "../middleware/auth.js";
+
+const router = express.Router();
+const BILL_STATUSES = new Set(["upcoming", "paid", "overdue"]);
+
+function toDateString(value) {
+  return value instanceof Date ? value.toISOString().slice(0, 10) : value;
+}
+
+function toBill(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    name: row.name,
+    amount: Number(row.amount),
+    dueDate: toDateString(row.due_date),
+    category: row.category,
+    status: row.status,
+    notes: row.notes || "",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function validateBill(input) {
+  const errors = {};
+  const name = String(input.name || "").trim();
+  const amount = Number(input.amount);
+  const dueDate = String(input.dueDate || input.due_date || "").trim();
+  const category = String(input.category || "").trim();
+  const status = String(input.status || "upcoming").trim().toLowerCase();
+  const notes = String(input.notes || "").trim();
+
+  if (name.length < 2) {
+    errors.name = "Bill name must be at least 2 characters.";
+  }
+
+  if (!Number.isFinite(amount) || amount < 0) {
+    errors.amount = "Amount must be a valid positive number.";
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+    errors.dueDate = "Due date must use YYYY-MM-DD.";
+  }
+
+  if (category.length < 2) {
+    errors.category = "Category must be at least 2 characters.";
+  }
+
+  if (!BILL_STATUSES.has(status)) {
+    errors.status = "Status must be upcoming, paid, or overdue.";
+  }
+
+  return {
+    values: {
+      name,
+      amount,
+      dueDate,
+      category,
+      status,
+      notes
+    },
+    errors
+  };
+}
+
+router.use(requireAuth);
+
+router.get("/", async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at
+       FROM bills
+       WHERE user_id = $1
+       ORDER BY due_date ASC, created_at DESC`,
+      [req.user.sub]
+    );
+
+    return res.json({ bills: result.rows.map(toBill) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at
+       FROM bills
+       WHERE id = $1 AND user_id = $2`,
+      [req.params.id, req.user.sub]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Bill was not found." });
+    }
+
+    return res.json({ bill: toBill(result.rows[0]) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post("/", async (req, res, next) => {
+  try {
+    const { values, errors } = validateBill(req.body);
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ message: "Bill details are invalid.", errors });
+    }
+
+    const result = await query(
+      `INSERT INTO bills (user_id, name, amount, due_date, category, status, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at`,
+      [req.user.sub, values.name, values.amount, values.dueDate, values.category, values.status, values.notes]
+    );
+
+    return res.status(201).json({ bill: toBill(result.rows[0]) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.put("/:id", async (req, res, next) => {
+  try {
+    const { values, errors } = validateBill(req.body);
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ message: "Bill details are invalid.", errors });
+    }
+
+    const result = await query(
+      `UPDATE bills
+       SET name = $1, amount = $2, due_date = $3, category = $4, status = $5, notes = $6
+       WHERE id = $7 AND user_id = $8
+       RETURNING id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at`,
+      [
+        values.name,
+        values.amount,
+        values.dueDate,
+        values.category,
+        values.status,
+        values.notes,
+        req.params.id,
+        req.user.sub
+      ]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Bill was not found." });
+    }
+
+    return res.json({ bill: toBill(result.rows[0]) });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const result = await query("DELETE FROM bills WHERE id = $1 AND user_id = $2", [req.params.id, req.user.sub]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Bill was not found." });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return next(error);
+  }
+});
+
+export default router;

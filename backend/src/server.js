@@ -2,6 +2,8 @@ import cors from "cors";
 import express from "express";
 import "./config/env.js";
 import authRoutes from "./routes/auth.js";
+import billRoutes from "./routes/bills.js";
+import subscriptionRoutes from "./routes/subscriptions.js";
 import userRoutes from "./routes/user.js";
 
 if (!process.env.JWT_SECRET) {
@@ -23,6 +25,8 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/bills", billRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/user", userRoutes);
 
 app.use((req, res) => {
