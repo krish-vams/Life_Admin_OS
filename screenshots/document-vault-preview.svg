@@ -1,0 +1,35 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" fill="#EEF4EE"/>
+  <text x="54" y="86" fill="#218579" font-family="Arial" font-size="13" font-weight="700">RECORDS WORKSPACE</text>
+  <text x="54" y="132" fill="#172019" font-family="Arial" font-size="44" font-weight="800">Document vault</text>
+  <text x="54" y="166" fill="#68746A" font-family="Arial" font-size="17">Track important document expirations and store protected files in one place.</text>
+  <rect x="54" y="214" width="390" height="430" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="84" y="258" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">ADD DOCUMENT</text>
+  <text x="84" y="292" fill="#172019" font-family="Arial" font-size="24" font-weight="800">Document details</text>
+  <rect x="84" y="328" width="300" height="44" rx="8" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="104" y="356" fill="#68746A" font-family="Arial" font-size="14">Passport</text>
+  <rect x="84" y="392" width="300" height="44" rx="8" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="104" y="420" fill="#68746A" font-family="Arial" font-size="14">Passport</text>
+  <rect x="84" y="456" width="300" height="44" rx="8" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="104" y="484" fill="#68746A" font-family="Arial" font-size="14">2026-12-15</text>
+  <rect x="84" y="548" width="300" height="48" rx="8" fill="#556B4E"/>
+  <text x="184" y="578" fill="#FFFFFF" font-family="Arial" font-size="14" font-weight="800">Add Document</text>
+  <rect x="482" y="214" width="664" height="430" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="512" y="258" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">DOCUMENTS</text>
+  <text x="512" y="292" fill="#172019" font-family="Arial" font-size="24" font-weight="800">Document vault</text>
+  <rect x="512" y="326" width="572" height="230" rx="10" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="542" y="368" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Driver's License</text>
+  <rect x="712" y="344" width="118" height="30" rx="15" fill="#FFF4D6"/>
+  <text x="734" y="364" fill="#8B6214" font-family="Arial" font-size="12" font-weight="800">Expiring Soon</text>
+  <text x="542" y="402" fill="#68746A" font-family="Arial" font-size="15">License | Expires Dec 15, 2026 | 25 days</text>
+  <text x="542" y="430" fill="#68746A" font-family="Arial" font-size="13" font-weight="700">Reminder 30 days before</text>
+  <rect x="542" y="464" width="500" height="64" rx="9" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="566" y="490" fill="#6B766D" font-family="Arial" font-size="11" font-weight="700">STORED FILE</text>
+  <text x="566" y="512" fill="#172019" font-family="Arial" font-size="14" font-weight="700">application/pdf | 1.4 MB | Uploaded May 14, 2026</text>
+  <rect x="902" y="478" width="92" height="34" rx="8" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="921" y="500" fill="#172019" font-family="Arial" font-size="12" font-weight="800">Download</text>
+  <rect x="542" y="580" width="250" height="44" rx="8" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="568" y="608" fill="#68746A" font-family="Arial" font-size="14">Choose file...</text>
+  <rect x="812" y="580" width="134" height="44" rx="8" fill="#556B4E"/>
+  <text x="840" y="608" fill="#FFFFFF" font-family="Arial" font-size="13" font-weight="800">Replace File</text>
+</svg>

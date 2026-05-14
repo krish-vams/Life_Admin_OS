@@ -627,7 +627,7 @@ export default function ManagePage({ initialPanel = "bills" }) {
       <section className="mx-auto max-w-7xl px-5 py-8">
         <div className="mb-7 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <p className="text-sm font-black uppercase text-teal">Phase 4</p>
+            <p className="text-sm font-black uppercase text-teal">Records Workspace</p>
             <h1 className="mt-2 text-4xl font-black leading-tight sm:text-5xl">
               Manage records
             </h1>

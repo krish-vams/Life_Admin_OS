@@ -1,0 +1,56 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" fill="#EEF4EE"/>
+  <rect x="0" y="0" width="1200" height="76" fill="#FFFFFF"/>
+  <rect x="48" y="22" width="34" height="34" rx="7" fill="#556B4E"/>
+  <text x="59" y="44" fill="#FFFFFF" font-family="Arial" font-size="13" font-weight="700">LA</text>
+  <text x="96" y="35" fill="#172019" font-family="Arial" font-size="18" font-weight="700">Life Admin OS</text>
+  <text x="96" y="55" fill="#6B766D" font-family="Arial" font-size="11" font-weight="700">OPERATIONS DASHBOARD</text>
+  <rect x="650" y="18" width="430" height="40" rx="8" fill="#EEF4EE" stroke="#D7DED8"/>
+  <text x="678" y="43" fill="#172019" font-family="Arial" font-size="13" font-weight="700">Dashboard</text>
+  <text x="768" y="43" fill="#6B766D" font-family="Arial" font-size="13" font-weight="700">Analytics</text>
+  <text x="852" y="43" fill="#6B766D" font-family="Arial" font-size="13" font-weight="700">Bills</text>
+  <text x="910" y="43" fill="#6B766D" font-family="Arial" font-size="13" font-weight="700">Subscriptions</text>
+  <text x="1030" y="43" fill="#6B766D" font-family="Arial" font-size="13" font-weight="700">Docs</text>
+  <text x="48" y="132" fill="#218579" font-family="Arial" font-size="13" font-weight="700">OPERATIONS DASHBOARD</text>
+  <text x="48" y="178" fill="#172019" font-family="Arial" font-size="44" font-weight="800">Upcoming responsibilities</text>
+  <text x="48" y="212" fill="#68746A" font-family="Arial" font-size="17">Scan bills, renewals, document expiries, and alerts from one focused dashboard.</text>
+  <g>
+    <rect x="48" y="250" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+    <text x="72" y="286" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">TOTAL SUBSCRIPTIONS</text>
+    <text x="72" y="332" fill="#172019" font-family="Arial" font-size="36" font-weight="800">8</text>
+  </g>
+  <g>
+    <rect x="322" y="250" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+    <text x="346" y="286" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">MONTHLY COST</text>
+    <text x="346" y="332" fill="#172019" font-family="Arial" font-size="36" font-weight="800">$124.76</text>
+  </g>
+  <g>
+    <rect x="596" y="250" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+    <text x="620" y="286" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">UPCOMING BILLS</text>
+    <text x="620" y="332" fill="#172019" font-family="Arial" font-size="36" font-weight="800">3</text>
+  </g>
+  <g>
+    <rect x="870" y="250" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+    <text x="894" y="286" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">DOCUMENTS EXPIRING</text>
+    <text x="894" y="332" fill="#172019" font-family="Arial" font-size="36" font-weight="800">2</text>
+  </g>
+  <rect x="48" y="392" width="690" height="286" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="78" y="434" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Notifications</text>
+  <rect x="78" y="466" width="610" height="58" rx="9" fill="#EEF4EE"/>
+  <text x="102" y="492" fill="#172019" font-family="Arial" font-size="15" font-weight="700">Electricity bill is due soon</text>
+  <text x="102" y="514" fill="#68746A" font-family="Arial" font-size="13">Due in 3 days - $85.00</text>
+  <rect x="78" y="540" width="610" height="58" rx="9" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="102" y="566" fill="#172019" font-family="Arial" font-size="15" font-weight="700">Passport expires soon</text>
+  <text x="102" y="588" fill="#68746A" font-family="Arial" font-size="13">Expires in 25 days</text>
+  <rect x="768" y="392" width="354" height="286" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="798" y="434" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Subscription Cost Snapshot</text>
+  <text x="798" y="486" fill="#172019" font-family="Arial" font-size="14" font-weight="700">Netflix</text>
+  <rect x="798" y="502" width="270" height="12" rx="6" fill="#EEF4EE"/>
+  <rect x="798" y="502" width="230" height="12" rx="6" fill="#218579"/>
+  <text x="798" y="546" fill="#172019" font-family="Arial" font-size="14" font-weight="700">Spotify</text>
+  <rect x="798" y="562" width="270" height="12" rx="6" fill="#EEF4EE"/>
+  <rect x="798" y="562" width="150" height="12" rx="6" fill="#218579"/>
+  <text x="798" y="606" fill="#172019" font-family="Arial" font-size="14" font-weight="700">iCloud</text>
+  <rect x="798" y="622" width="270" height="12" rx="6" fill="#EEF4EE"/>
+  <rect x="798" y="622" width="92" height="12" rx="6" fill="#218579"/>
+</svg>

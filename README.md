@@ -1,153 +1,206 @@
 # Life Admin OS
 
-Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
+Life Admin OS is a full-stack personal management dashboard for bills, subscriptions, document expirations, reminders, and recurring responsibilities. It starts with manual tracking and grows into an automation platform with Gmail detection, background jobs, notification delivery, document file storage, analytics, testing, and deployment setup.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, secure document uploads, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, Google Calendar sync, rate limiting, structured logging, stronger backend validation, automated tests, and production deployment setup. Users can register, log in, manage recurring payments, track document expirations, store important files, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
+## Portfolio Summary
 
-## Current Phase
+Built a full-stack personal management dashboard that helps users track bills, subscriptions, document expiry dates, and reminders. Integrated Gmail-based detection, background job processing, document uploads, analytics, Google Calendar sync, and notification workflows to automate recurring life-admin tasks.
 
-Phase 13: Deployment and Production Setup
+## Screenshots
 
-- React frontend with protected routing.
-- Express backend with auth APIs.
-- PostgreSQL `users` table.
-- Password hashing with bcrypt.
-- JWT authentication.
-- Basic user profile on the dashboard.
-- User-scoped bill CRUD.
-- User-scoped subscription CRUD.
-- User-scoped document CRUD.
-- Expiry status tracking for valid, expiring soon, and expired documents.
-- PDF, JPG, and PNG file uploads for document records.
-- Protected signed download links for stored document files.
-- Document file metadata for type, size, storage key, and upload date.
-- Shared backend validation for emails, UUIDs, dates, amounts, and reminder settings.
-- Global API rate limiting with configurable request windows.
-- Clean API error responses with structured server-side logs.
-- Failed login, blocked auth, Gmail failure, and background job failure logging.
-- Backend unit, API, and integration tests.
-- Frontend unit tests for subscription cost calculations.
-- Test scripts for the full repo, backend, and frontend.
-- Dockerfiles for backend and frontend production builds.
-- Render, Railway, Vercel, and Netlify starter deployment configs.
-- Production environment variable guidance.
-- Separate API and worker deployment plan.
-- Dedicated pages for `/dashboard`, `/analytics`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
-- Dashboard summaries for total subscriptions, monthly subscription spend, upcoming bills, and expiring documents.
-- Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
+![Dashboard preview](screenshots/dashboard-preview.svg)
+
+![Analytics preview](screenshots/analytics-preview.svg)
+
+![Document vault preview](screenshots/document-vault-preview.svg)
+
+## Features
+
+- Secure account registration and JWT login.
+- Protected dashboard with user-scoped data.
+- Bill, subscription, and document CRUD.
+- Document expiry statuses for valid, expiring soon, and expired records.
+- PDF, JPG, and PNG document uploads with signed download links.
+- In-app notifications with unread, read, and dismissed states.
 - Reminder preferences for bills, subscriptions, and documents.
-- Database-backed notifications with unread, read, and dismissed states.
-- Redis/BullMQ background queue for reminder checks, email scans, and notification jobs.
-- Gmail OAuth connection flow.
-- Gmail scan jobs that create pending detected-item suggestions.
-- User confirmation workflow for detected bills and subscriptions.
-- Analytics for monthly subscription total, category spending, upcoming expenses, duplicate subscription alerts, and renewal predictions.
-- Reminder delivery preferences for in-app only, email, calendar event, or all reminders.
-- SMTP-backed email reminder delivery.
-- Google Calendar event creation for due dates and expiries.
+- Redis/BullMQ worker for reminder checks, Gmail scans, and notification delivery.
+- Gmail OAuth and detected-item review workflow.
+- Google Calendar event creation and SMTP email reminders.
+- Analytics for monthly subscription spend, category spend, upcoming expenses, duplicate subscriptions, and renewal predictions.
+- Rate limiting, structured logging, validation, and clean API errors.
+- Automated backend and frontend tests.
+- Production deployment setup for Docker, Render, Railway, Vercel, and Netlify.
+
+## Tech Stack
+
+Frontend:
+
+- React
+- React Router
+- Vite
+- Tailwind CSS
+
+Backend:
+
+- Node.js
+- Express
+- PostgreSQL
+- JWT
+- bcrypt
+- BullMQ
+- Redis
+- Google APIs
+- Multer
+
+Infrastructure and tooling:
+
+- Docker
+- Render/Railway backend configs
+- Vercel/Netlify frontend configs
+- Node test runner
+
+## Architecture
+
+The system is split into three runtime services:
+
+- Frontend: React single-page app for auth, dashboard, management pages, analytics, settings, and document vault interactions.
+- Backend API: Express app that owns authentication, validation, CRUD APIs, Gmail OAuth, notifications, signed document access, and analytics.
+- Worker: BullMQ worker that runs scheduled and heavy jobs outside the request path.
+
+Supporting services:
+
+- PostgreSQL stores users, bills, subscriptions, documents, notifications, Gmail connections, preferences, and detected items.
+- Redis backs the job queue.
+- Document storage uses a configurable storage directory today and is ready for an S3/Supabase/Cloudinary storage-driver upgrade.
+
+See [docs/architecture.md](docs/architecture.md) for a deeper system walkthrough.
 
 ## Run Locally
 
-1. Install dependencies:
+Install dependencies:
 
 ```bash
 npm install --prefix backend
 npm install --prefix frontend
 ```
 
-2. Create the database:
-
-```bash
-createdb life_admin_os
-psql life_admin_os < database/schema.sql
-```
-
-Or, if Docker is available:
+Start PostgreSQL and Redis:
 
 ```bash
 docker compose up -d postgres redis
 ```
 
-3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, `DOCUMENT_SIGNING_SECRET`, `DOCUMENT_STORAGE_DIR`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS`, and `REDIS_URL`. Gmail scanning and Calendar sync require Google OAuth values. Email reminders require SMTP values.
+Create `.env` from `.env.example` and set at least:
 
-4. Start the backend:
+```text
+DATABASE_URL=
+JWT_SECRET=
+DOCUMENT_SIGNING_SECRET=
+REDIS_URL=
+```
+
+Apply the schema:
+
+```bash
+psql "$DATABASE_URL" < database/schema.sql
+```
+
+Start the app:
 
 ```bash
 npm run dev:backend
-```
-
-5. Start the frontend:
-
-```bash
 npm run dev:frontend
-```
-
-6. Start the background worker:
-
-```bash
 npm run worker
 ```
 
-Then visit:
+Open:
 
 ```text
 http://localhost:5173
 ```
 
-Run tests:
+## Testing
+
+Run the full automated suite:
 
 ```bash
 npm test
 ```
 
-Run the deployment readiness check:
+Run deployment readiness checks:
 
 ```bash
 npm run deploy:check
 ```
 
-## API Routes
+Current coverage includes backend validation, email parsing, API handlers, analytics, reminder generation, and frontend subscription cost calculations.
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/analytics/summary`
-- `GET /api/user/profile`
-- `POST /api/bills`
-- `GET /api/bills`
-- `GET /api/bills/:id`
-- `PUT /api/bills/:id`
-- `DELETE /api/bills/:id`
-- `POST /api/subscriptions`
-- `GET /api/subscriptions`
-- `GET /api/subscriptions/:id`
-- `PUT /api/subscriptions/:id`
-- `DELETE /api/subscriptions/:id`
-- `POST /api/documents`
-- `GET /api/documents`
-- `GET /api/documents/:id`
-- `PUT /api/documents/:id`
-- `POST /api/documents/:id/upload`
-- `GET /api/documents/:id/download-url`
-- `GET /api/documents/:id/download`
-- `DELETE /api/documents/:id`
-- `GET /api/notifications`
-- `PUT /api/notifications/:id/status`
-- `POST /api/notifications/:id/send`
-- `GET /api/notification-preferences`
-- `PUT /api/notification-preferences`
-- `POST /api/jobs/check-upcoming-reminders`
-- `POST /api/jobs/scan-user-email`
-- `GET /api/gmail/status`
-- `GET /api/gmail/auth-url`
-- `GET /api/gmail/callback`
-- `POST /api/gmail/scan`
-- `GET /api/detected-items`
-- `POST /api/detected-items/:id/confirm`
-- `POST /api/detected-items/:id/ignore`
+## Deployment
 
-## Project Docs
+The repo includes:
+
+- `backend/Dockerfile`
+- `frontend/Dockerfile`
+- `docker-compose.yml`
+- `render.yaml`
+- `railway.json`
+- `vercel.json`
+- `netlify.toml`
+
+Production guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+## Project Structure
+
+```text
+Life_Admin_OS/
+  backend/
+    src/
+      config/
+      middleware/
+      queues/
+      routes/
+      services/
+      utils/
+      workers/
+    test/
+  database/
+    schema.sql
+  docs/
+    architecture.md
+    api-design.md
+    database-schema.md
+    DEPLOYMENT.md
+    TESTING.md
+  frontend/
+    src/
+      api/
+      components/
+      hooks/
+      pages/
+      state/
+      utils/
+    test/
+  screenshots/
+  README.md
+```
+
+## Documentation
 
 - [Project context](docs/PROJECT_CONTEXT.md)
 - [Phase plan](docs/PHASE_PLAN.md)
+- [Architecture](docs/architecture.md)
+- [API design](docs/api-design.md)
+- [Database schema](docs/database-schema.md)
 - [Testing guide](docs/TESTING.md)
 - [Deployment guide](docs/DEPLOYMENT.md)
+- [Demo script](docs/demo-script.md)
+- [Resume notes](docs/resume.md)
+
+## Future Improvements
+
+- Replace local document storage with S3, Supabase Storage, or Cloudinary.
+- Add Playwright end-to-end tests for the core user journey.
+- Add a production seed/demo account for portfolio walkthroughs.
+- Add richer Gmail parsing with structured extraction and confidence explanations.
+- Add exportable monthly reports.
+- Add team or household sharing for shared bills and documents.

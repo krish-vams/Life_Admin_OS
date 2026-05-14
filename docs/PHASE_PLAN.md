@@ -112,7 +112,7 @@ Scope:
 - Node.js worker service.
 - Daily `check-upcoming-reminders` job.
 - On-demand `scan-user-email` job.
-- `send-notification` job placeholder for future email delivery.
+- `send-notification` job for notification delivery.
 - API endpoints for queuing reminder checks and Gmail scans.
 
 Success criteria:
@@ -258,7 +258,26 @@ Success criteria:
 - The backend API and worker have clear production start commands.
 - PostgreSQL, Redis, and document storage setup are documented for production providers.
 
-## Phase 14: Automation And Insights
+## Phase 14: Final Polish and Portfolio Preparation
+
+Goal: Make the project ready for GitHub, resume, and interviews.
+
+Scope:
+
+- Remove stale phase labels from user-facing UI.
+- Rewrite README with project overview, features, tech stack, screenshots, architecture, setup, deployment, and future improvements.
+- Add architecture, API design, database schema, demo script, and resume notes.
+- Add screenshot preview assets and screenshots folder.
+- Keep the repository structure easy to scan for recruiters and hiring managers.
+
+Success criteria:
+
+- The GitHub README tells a complete portfolio story.
+- Documentation supports technical interview discussion.
+- The app UI reads like a finished product rather than a phase demo.
+- Recruiters can understand the project quickly from the repository.
+
+## Phase 15: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

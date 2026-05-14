@@ -1,0 +1,40 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" fill="#EEF4EE"/>
+  <text x="54" y="86" fill="#218579" font-family="Arial" font-size="13" font-weight="700">SPENDING INSIGHTS</text>
+  <text x="54" y="132" fill="#172019" font-family="Arial" font-size="44" font-weight="800">Smart insights</text>
+  <text x="54" y="166" fill="#68746A" font-family="Arial" font-size="17">Understand recurring spending, upcoming payments, duplicate subscriptions, and renewal patterns.</text>
+  <rect x="54" y="212" width="250" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="78" y="248" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">MONTHLY SUBSCRIPTIONS</text>
+  <text x="78" y="294" fill="#172019" font-family="Arial" font-size="36" font-weight="800">$124.76</text>
+  <rect x="326" y="212" width="250" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="350" y="248" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">NEXT 7 DAYS</text>
+  <text x="350" y="294" fill="#172019" font-family="Arial" font-size="36" font-weight="800">$86.50</text>
+  <rect x="598" y="212" width="250" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="622" y="248" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">NEXT 15 DAYS</text>
+  <text x="622" y="294" fill="#172019" font-family="Arial" font-size="36" font-weight="800">$173.20</text>
+  <rect x="870" y="212" width="250" height="112" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="894" y="248" fill="#6B766D" font-family="Arial" font-size="12" font-weight="700">NEXT 30 DAYS</text>
+  <text x="894" y="294" fill="#172019" font-family="Arial" font-size="36" font-weight="800">$298.91</text>
+  <rect x="54" y="360" width="650" height="320" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="84" y="404" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Category-Based Subscription Spending</text>
+  <text x="84" y="462" fill="#172019" font-family="Arial" font-size="15" font-weight="700">Entertainment</text>
+  <text x="594" y="462" fill="#172019" font-family="Arial" font-size="15" font-weight="700">$45.97</text>
+  <rect x="84" y="482" width="540" height="14" rx="7" fill="#EEF4EE"/>
+  <rect x="84" y="482" width="475" height="14" rx="7" fill="#218579"/>
+  <text x="84" y="532" fill="#172019" font-family="Arial" font-size="15" font-weight="700">Productivity</text>
+  <text x="594" y="532" fill="#172019" font-family="Arial" font-size="15" font-weight="700">$29.99</text>
+  <rect x="84" y="552" width="540" height="14" rx="7" fill="#EEF4EE"/>
+  <rect x="84" y="552" width="310" height="14" rx="7" fill="#218579"/>
+  <text x="84" y="602" fill="#172019" font-family="Arial" font-size="15" font-weight="700">Fitness</text>
+  <text x="594" y="602" fill="#172019" font-family="Arial" font-size="15" font-weight="700">$35.00</text>
+  <rect x="84" y="622" width="540" height="14" rx="7" fill="#EEF4EE"/>
+  <rect x="84" y="622" width="360" height="14" rx="7" fill="#218579"/>
+  <rect x="736" y="360" width="384" height="320" rx="10" fill="#FFFFFF" stroke="#D7DED8"/>
+  <text x="766" y="404" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Duplicate Alerts</text>
+  <rect x="766" y="438" width="306" height="82" rx="9" fill="#FFF4D6"/>
+  <text x="790" y="470" fill="#8B6214" font-family="Arial" font-size="15" font-weight="700">Multiple entertainment subscriptions</text>
+  <text x="790" y="494" fill="#8B6214" font-family="Arial" font-size="13">Netflix, Hulu, Disney+</text>
+  <text x="766" y="576" fill="#172019" font-family="Arial" font-size="22" font-weight="800">Renewal Prediction</text>
+  <text x="766" y="620" fill="#68746A" font-family="Arial" font-size="14">Spotify was charged monthly.</text>
+  <text x="766" y="646" fill="#172019" font-family="Arial" font-size="17" font-weight="800">Next renewal: Apr 10</text>
+</svg>

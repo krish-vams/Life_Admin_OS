@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
 
   return (
     <AppShell
-      eyebrow="Phase 8 Analytics"
+      eyebrow="Spending Insights"
       title="Smart insights"
       subtitle="Understand recurring spending, upcoming payments, duplicate subscriptions, and renewal patterns."
     >
@@ -204,4 +204,3 @@ export default function AnalyticsPage() {
     </AppShell>
   );
 }
-

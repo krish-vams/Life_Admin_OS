@@ -117,7 +117,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell
-      eyebrow="Phase 4 Dashboard"
+      eyebrow="Operations Dashboard"
       title="Upcoming responsibilities"
       subtitle="Scan bills, renewals, document expiries, and alerts from one focused dashboard."
     >

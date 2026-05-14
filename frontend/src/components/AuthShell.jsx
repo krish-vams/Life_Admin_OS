@@ -16,12 +16,12 @@ export default function AuthShell({ title, subtitle, switchText, switchTo, switc
           </div>
 
           <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase text-white/60">Phase 1 Foundation</p>
+            <p className="text-sm font-bold uppercase text-white/60">Personal Admin System</p>
             <h1 className="mt-4 max-w-xl text-5xl font-black leading-tight">
               One protected home for bills, subscriptions, documents, and reminders.
             </h1>
             <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
-              {["Secure login", "Private profile", "Dashboard access"].map((item) => (
+              {["Secure login", "Smart reminders", "Document vault"].map((item) => (
                 <div key={item} className="rounded-app border border-white/15 bg-white/10 p-4 text-sm font-bold">
                   {item}
                 </div>
@@ -52,4 +52,3 @@ export default function AuthShell({ title, subtitle, switchText, switchTo, switc
     </main>
   );
 }
-
