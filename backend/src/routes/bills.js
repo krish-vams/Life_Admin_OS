@@ -16,6 +16,7 @@ function toBill(row) {
     name: row.name,
     amount: Number(row.amount),
     dueDate: toDateString(row.due_date),
+    reminderDaysBefore: Number(row.reminder_days_before),
     category: row.category,
     status: row.status,
     notes: row.notes || "",
@@ -29,6 +30,7 @@ function validateBill(input) {
   const name = String(input.name || "").trim();
   const amount = Number(input.amount);
   const dueDate = String(input.dueDate || input.due_date || "").trim();
+  const reminderDaysBefore = Number(input.reminderDaysBefore ?? input.reminder_days_before ?? 3);
   const category = String(input.category || "").trim();
   const status = String(input.status || "upcoming").trim().toLowerCase();
   const notes = String(input.notes || "").trim();
@@ -45,6 +47,10 @@ function validateBill(input) {
     errors.dueDate = "Due date must use YYYY-MM-DD.";
   }
 
+  if (!Number.isInteger(reminderDaysBefore) || reminderDaysBefore < 0) {
+    errors.reminderDaysBefore = "Reminder preference must be zero or more days.";
+  }
+
   if (category.length < 2) {
     errors.category = "Category must be at least 2 characters.";
   }
@@ -58,6 +64,7 @@ function validateBill(input) {
       name,
       amount,
       dueDate,
+      reminderDaysBefore,
       category,
       status,
       notes
@@ -71,7 +78,7 @@ router.use(requireAuth);
 router.get("/", async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at
+      `SELECT id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at
        FROM bills
        WHERE user_id = $1
        ORDER BY due_date ASC, created_at DESC`,
@@ -87,7 +94,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at
+      `SELECT id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at
        FROM bills
        WHERE id = $1 AND user_id = $2`,
       [req.params.id, req.user.sub]
@@ -112,10 +119,19 @@ router.post("/", async (req, res, next) => {
     }
 
     const result = await query(
-      `INSERT INTO bills (user_id, name, amount, due_date, category, status, notes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at`,
-      [req.user.sub, values.name, values.amount, values.dueDate, values.category, values.status, values.notes]
+      `INSERT INTO bills (user_id, name, amount, due_date, reminder_days_before, category, status, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at`,
+      [
+        req.user.sub,
+        values.name,
+        values.amount,
+        values.dueDate,
+        values.reminderDaysBefore,
+        values.category,
+        values.status,
+        values.notes
+      ]
     );
 
     return res.status(201).json({ bill: toBill(result.rows[0]) });
@@ -134,13 +150,14 @@ router.put("/:id", async (req, res, next) => {
 
     const result = await query(
       `UPDATE bills
-       SET name = $1, amount = $2, due_date = $3, category = $4, status = $5, notes = $6
-       WHERE id = $7 AND user_id = $8
-       RETURNING id, user_id, name, amount, due_date, category, status, notes, created_at, updated_at`,
+       SET name = $1, amount = $2, due_date = $3, reminder_days_before = $4, category = $5, status = $6, notes = $7
+       WHERE id = $8 AND user_id = $9
+       RETURNING id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at`,
       [
         values.name,
         values.amount,
         values.dueDate,
+        values.reminderDaysBefore,
         values.category,
         values.status,
         values.notes,

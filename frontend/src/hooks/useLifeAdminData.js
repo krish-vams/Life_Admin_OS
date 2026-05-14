@@ -6,6 +6,7 @@ export default function useLifeAdminData(token) {
   const [bills, setBills] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -17,16 +18,18 @@ export default function useLifeAdminData(token) {
       setError("");
 
       try {
-        const [billData, subscriptionData, documentData] = await Promise.all([
+        const [billData, subscriptionData, documentData, notificationData] = await Promise.all([
           apiRequest("/api/bills", { token }),
           apiRequest("/api/subscriptions", { token }),
-          apiRequest("/api/documents", { token })
+          apiRequest("/api/documents", { token }),
+          apiRequest("/api/notifications", { token })
         ]);
 
         if (isMounted) {
           setBills(billData.bills);
           setSubscriptions(subscriptionData.subscriptions);
           setDocuments(documentData.documents);
+          setNotifications(notificationData.notifications);
         }
       } catch (requestError) {
         if (isMounted) {
@@ -45,6 +48,20 @@ export default function useLifeAdminData(token) {
       isMounted = false;
     };
   }, [token]);
+
+  async function updateNotificationStatus(id, status) {
+    const data = await apiRequest(`/api/notifications/${id}/status`, {
+      method: "PUT",
+      token,
+      body: { status }
+    });
+
+    setNotifications((current) =>
+      current.map((notification) => (notification.id === id ? data.notification : notification))
+    );
+
+    return data.notification;
+  }
 
   const summary = useMemo(() => {
     const openBills = bills.filter((bill) => bill.status !== "paid");
@@ -77,9 +94,10 @@ export default function useLifeAdminData(token) {
     bills,
     subscriptions,
     documents,
+    notifications,
     isLoading,
     error,
-    summary
+    summary,
+    updateNotificationStatus
   };
 }
-

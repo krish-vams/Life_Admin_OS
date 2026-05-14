@@ -7,6 +7,7 @@ const billDefaults = {
   name: "",
   amount: "",
   dueDate: "",
+  reminderDaysBefore: "3",
   category: "Utilities",
   status: "upcoming",
   notes: ""
@@ -17,6 +18,7 @@ const subscriptionDefaults = {
   amount: "",
   billingCycle: "monthly",
   nextRenewalDate: "",
+  reminderDaysBefore: "3",
   category: "Entertainment",
   status: "active",
   notes: ""
@@ -47,6 +49,13 @@ const billingCycles = [
   ["monthly", "Monthly"],
   ["quarterly", "Quarterly"],
   ["yearly", "Yearly"]
+];
+
+const reminderOptions = [
+  ["1", "1 day before"],
+  ["3", "3 days before"],
+  ["7", "7 days before"],
+  ["30", "30 days before"]
 ];
 
 function formatDate(value) {
@@ -380,6 +389,7 @@ export default function ManagePage({ initialPanel = "bills" }) {
       name: bill.name,
       amount: String(bill.amount),
       dueDate: bill.dueDate,
+      reminderDaysBefore: String(bill.reminderDaysBefore ?? 3),
       category: bill.category,
       status: bill.status,
       notes: bill.notes || ""
@@ -394,6 +404,7 @@ export default function ManagePage({ initialPanel = "bills" }) {
       amount: String(subscription.amount),
       billingCycle: subscription.billingCycle,
       nextRenewalDate: subscription.nextRenewalDate,
+      reminderDaysBefore: String(subscription.reminderDaysBefore ?? 3),
       category: subscription.category,
       status: subscription.status,
       notes: subscription.notes || ""
@@ -680,6 +691,18 @@ export default function ManagePage({ initialPanel = "bills" }) {
                     type="date"
                     value={billForm.dueDate}
                   />
+                  <SelectInput
+                    label="Reminder"
+                    name="reminderDaysBefore"
+                    onChange={updateBillForm}
+                    value={billForm.reminderDaysBefore}
+                  >
+                    {reminderOptions.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </SelectInput>
                   <TextInput
                     label="Category"
                     name="category"
@@ -778,6 +801,18 @@ export default function ManagePage({ initialPanel = "bills" }) {
                     type="date"
                     value={subscriptionForm.nextRenewalDate}
                   />
+                  <SelectInput
+                    label="Reminder"
+                    name="reminderDaysBefore"
+                    onChange={updateSubscriptionForm}
+                    value={subscriptionForm.reminderDaysBefore}
+                  >
+                    {reminderOptions.map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </SelectInput>
                   <TextInput
                     label="Category"
                     name="category"
@@ -950,6 +985,9 @@ export default function ManagePage({ initialPanel = "bills" }) {
                           <p className="mt-2 text-sm leading-6 text-black/60">
                             {bill.category} | Due {formatDate(bill.dueDate)} | {relativeDateLabel(bill.dueDate)}
                           </p>
+                          <p className="mt-1 text-xs font-black uppercase text-black/45">
+                            Reminder {bill.reminderDaysBefore} days before
+                          </p>
                           {bill.notes ? <p className="mt-2 text-sm leading-6 text-black/60">{bill.notes}</p> : null}
                         </div>
                         <div className="text-left md:text-right">
@@ -1020,6 +1058,9 @@ export default function ManagePage({ initialPanel = "bills" }) {
                           <p className="mt-2 text-sm leading-6 text-black/60">
                             {subscription.category} | Renews {formatDate(subscription.nextRenewalDate)} |{" "}
                             {relativeDateLabel(subscription.nextRenewalDate)}
+                          </p>
+                          <p className="mt-1 text-xs font-black uppercase text-black/45">
+                            Reminder {subscription.reminderDaysBefore} days before
                           </p>
                           {subscription.notes ? (
                             <p className="mt-2 text-sm leading-6 text-black/60">{subscription.notes}</p>

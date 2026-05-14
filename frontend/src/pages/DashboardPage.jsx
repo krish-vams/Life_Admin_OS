@@ -70,7 +70,16 @@ function CostBar({ label, value, max }) {
 
 export default function DashboardPage() {
   const { token } = useAuth();
-  const { bills, subscriptions, documents, isLoading, error, summary } = useLifeAdminData(token);
+  const {
+    bills,
+    subscriptions,
+    documents,
+    notifications,
+    isLoading,
+    error,
+    summary,
+    updateNotificationStatus
+  } = useLifeAdminData(token);
 
   const upcomingBills = bills
     .filter((bill) => bill.status !== "paid")
@@ -92,23 +101,9 @@ export default function DashboardPage() {
     .filter((document) => document.status === "expiring_soon" || document.status === "expired")
     .slice(0, 5);
 
-  const alerts = [
-    ...upcomingBills.map((bill) => ({
-      id: `bill-${bill.id}`,
-      text: `${bill.name} is due ${relativeDateLabel(bill.dueDate, "tomorrow")}.`,
-      tone: daysUntil(bill.dueDate) <= 3 ? "danger" : "warn"
-    })),
-    ...upcomingRenewals.map((subscription) => ({
-      id: `subscription-${subscription.id}`,
-      text: `${subscription.name} renews ${relativeDateLabel(subscription.nextRenewalDate, "tomorrow")}.`,
-      tone: daysUntil(subscription.nextRenewalDate) <= 3 ? "danger" : "warn"
-    })),
-    ...expiringDocuments.map((document) => ({
-      id: `document-${document.id}`,
-      text: `${document.name} ${document.status === "expired" ? "has expired" : `expires ${relativeDateLabel(document.expiryDate)}`}.`,
-      tone: document.status === "expired" ? "danger" : "warn"
-    }))
-  ].slice(0, 8);
+  const activeNotifications = notifications
+    .filter((notification) => notification.status !== "dismissed")
+    .slice(0, 8);
 
   const chartRows = subscriptions
     .filter((subscription) => subscription.status === "active")
@@ -143,14 +138,49 @@ export default function DashboardPage() {
         <Panel title="Notifications">
           {isLoading ? (
             <EmptyPanel>Loading alerts...</EmptyPanel>
-          ) : alerts.length === 0 ? (
+          ) : activeNotifications.length === 0 ? (
             <EmptyPanel>No urgent notifications right now.</EmptyPanel>
           ) : (
             <div className="grid gap-3">
-              {alerts.map((alert) => (
-                <div className="flex items-center justify-between gap-3 rounded-app bg-sage p-4" key={alert.id}>
-                  <p className="text-sm font-bold text-black/70">{alert.text}</p>
-                  <StatusBadge tone={alert.tone}>Alert</StatusBadge>
+              {activeNotifications.map((notification) => (
+                <div
+                  className={`rounded-app p-4 ${
+                    notification.status === "unread" ? "bg-sage" : "border border-black/10 bg-white"
+                  }`}
+                  key={notification.id}
+                >
+                  <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-black">{notification.title}</h3>
+                        <StatusBadge tone={notification.status === "unread" ? "warn" : "neutral"}>
+                          {readableStatus(notification.status)}
+                        </StatusBadge>
+                      </div>
+                      <p className="mt-2 text-sm font-bold text-black/70">{notification.message}</p>
+                      <p className="mt-1 text-xs font-black uppercase text-black/45">
+                        Scheduled {formatDate(notification.scheduledFor)}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {notification.status === "unread" ? (
+                        <button
+                          className="h-9 rounded-app border border-black/10 bg-white px-3 text-xs font-black"
+                          onClick={() => updateNotificationStatus(notification.id, "read")}
+                          type="button"
+                        >
+                          Mark Read
+                        </button>
+                      ) : null}
+                      <button
+                        className="h-9 rounded-app border border-coral/20 bg-coral/10 px-3 text-xs font-black text-coral"
+                        onClick={() => updateNotificationStatus(notification.id, "dismissed")}
+                        type="button"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -248,4 +278,3 @@ export default function DashboardPage() {
     </AppShell>
   );
 }
-

@@ -4,8 +4,10 @@ import "./config/env.js";
 import authRoutes from "./routes/auth.js";
 import billRoutes from "./routes/bills.js";
 import documentRoutes from "./routes/documents.js";
+import notificationRoutes from "./routes/notifications.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import userRoutes from "./routes/user.js";
+import { startDailyReminderJob } from "./services/reminders.js";
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET is required");
@@ -28,6 +30,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/user", userRoutes);
 
@@ -43,3 +46,5 @@ app.use((error, _req, res, _next) => {
 app.listen(port, () => {
   console.log(`Life Admin OS API listening on port ${port}`);
 });
+
+startDailyReminderJob();

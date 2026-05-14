@@ -84,21 +84,23 @@ Success criteria:
 - Bills, subscriptions, and documents have dedicated pages.
 - The dashboard is clean, minimal, professional, mobile responsive, and easy to scan.
 
-## Phase 5: Smart Reminders
+## Phase 5: Reminder and Notification System
 
-Goal: Turn tracked items into an active reminder system.
+Goal: Notify users before important dates so the app actively helps prevent missed deadlines.
 
 Scope:
 
-- Reminder rules such as 1 day, 3 days, 7 days, or 30 days before due dates.
-- Reminder status tracking.
-- Email or in-app notifications.
-- Dashboard filters for overdue, due soon, and completed items.
+- In-app notifications for bills, subscription renewals, and document expiries.
+- Reminder preferences such as 1 day, 3 days, 7 days, or 30 days before key dates.
+- Notification statuses: unread, read, and dismissed.
+- Daily reminder check for bills due soon, subscriptions renewing soon, and documents expiring soon.
+- Notifications database table.
 
 Success criteria:
 
-- The user can configure reminder timing.
-- The system can identify overdue and upcoming items automatically.
+- The user can choose when they want to be reminded.
+- The system generates useful reminders before important dates.
+- The user can mark notifications as read or dismiss them.
 
 ## Phase 6: Gmail Detection
 

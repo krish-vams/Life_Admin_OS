@@ -18,6 +18,7 @@ function toSubscription(row) {
     amount: Number(row.amount),
     billingCycle: row.billing_cycle,
     nextRenewalDate: toDateString(row.next_renewal_date),
+    reminderDaysBefore: Number(row.reminder_days_before),
     category: row.category,
     status: row.status,
     notes: row.notes || "",
@@ -32,6 +33,7 @@ function validateSubscription(input) {
   const amount = Number(input.amount);
   const billingCycle = String(input.billingCycle || input.billing_cycle || "monthly").trim().toLowerCase();
   const nextRenewalDate = String(input.nextRenewalDate || input.next_renewal_date || "").trim();
+  const reminderDaysBefore = Number(input.reminderDaysBefore ?? input.reminder_days_before ?? 3);
   const category = String(input.category || "").trim();
   const status = String(input.status || "active").trim().toLowerCase();
   const notes = String(input.notes || "").trim();
@@ -52,6 +54,10 @@ function validateSubscription(input) {
     errors.nextRenewalDate = "Renewal date must use YYYY-MM-DD.";
   }
 
+  if (!Number.isInteger(reminderDaysBefore) || reminderDaysBefore < 0) {
+    errors.reminderDaysBefore = "Reminder preference must be zero or more days.";
+  }
+
   if (category.length < 2) {
     errors.category = "Category must be at least 2 characters.";
   }
@@ -66,6 +72,7 @@ function validateSubscription(input) {
       amount,
       billingCycle,
       nextRenewalDate,
+      reminderDaysBefore,
       category,
       status,
       notes
@@ -79,7 +86,7 @@ router.use(requireAuth);
 router.get("/", async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, user_id, name, amount, billing_cycle, next_renewal_date, category, status, notes, created_at, updated_at
+      `SELECT id, user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes, created_at, updated_at
        FROM subscriptions
        WHERE user_id = $1
        ORDER BY next_renewal_date ASC, created_at DESC`,
@@ -95,7 +102,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, user_id, name, amount, billing_cycle, next_renewal_date, category, status, notes, created_at, updated_at
+      `SELECT id, user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes, created_at, updated_at
        FROM subscriptions
        WHERE id = $1 AND user_id = $2`,
       [req.params.id, req.user.sub]
@@ -120,15 +127,16 @@ router.post("/", async (req, res, next) => {
     }
 
     const result = await query(
-      `INSERT INTO subscriptions (user_id, name, amount, billing_cycle, next_renewal_date, category, status, notes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, user_id, name, amount, billing_cycle, next_renewal_date, category, status, notes, created_at, updated_at`,
+      `INSERT INTO subscriptions (user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes, created_at, updated_at`,
       [
         req.user.sub,
         values.name,
         values.amount,
         values.billingCycle,
         values.nextRenewalDate,
+        values.reminderDaysBefore,
         values.category,
         values.status,
         values.notes
@@ -151,14 +159,15 @@ router.put("/:id", async (req, res, next) => {
 
     const result = await query(
       `UPDATE subscriptions
-       SET name = $1, amount = $2, billing_cycle = $3, next_renewal_date = $4, category = $5, status = $6, notes = $7
-       WHERE id = $8 AND user_id = $9
-       RETURNING id, user_id, name, amount, billing_cycle, next_renewal_date, category, status, notes, created_at, updated_at`,
+       SET name = $1, amount = $2, billing_cycle = $3, next_renewal_date = $4, reminder_days_before = $5, category = $6, status = $7, notes = $8
+       WHERE id = $9 AND user_id = $10
+       RETURNING id, user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes, created_at, updated_at`,
       [
         values.name,
         values.amount,
         values.billingCycle,
         values.nextRenewalDate,
+        values.reminderDaysBefore,
         values.category,
         values.status,
         values.notes,
