@@ -64,7 +64,27 @@ Success criteria:
 - The dashboard clearly shows expired and expiring soon documents.
 - Document status is derived from the expiry date.
 
-## Phase 4: Smart Reminders
+## Phase 4: Dashboard and User Interface
+
+Goal: Build a clean and useful dashboard that gives users a quick overview of important tasks.
+
+Scope:
+
+- Summary cards for subscriptions, monthly subscription cost, upcoming bills, and expiring documents.
+- Upcoming bills section.
+- Upcoming subscription renewals section.
+- Expiring documents section.
+- Notifications section for important alerts.
+- Dedicated frontend pages for `/login`, `/register`, `/dashboard`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
+- Searchable management views and a simple subscription cost chart.
+
+Success criteria:
+
+- A logged-in user can quickly scan upcoming responsibilities.
+- Bills, subscriptions, and documents have dedicated pages.
+- The dashboard is clean, minimal, professional, mobile responsive, and easy to scan.
+
+## Phase 5: Smart Reminders
 
 Goal: Turn tracked items into an active reminder system.
 
@@ -80,7 +100,7 @@ Success criteria:
 - The user can configure reminder timing.
 - The system can identify overdue and upcoming items automatically.
 
-## Phase 5: Gmail Detection
+## Phase 6: Gmail Detection
 
 Goal: Reduce manual entry by detecting bills, subscriptions, and renewals from Gmail.
 
@@ -96,7 +116,7 @@ Success criteria:
 - The system suggests likely life-admin items from Gmail.
 - The user stays in control and approves detected items before saving them.
 
-## Phase 6: Google Calendar Sync
+## Phase 7: Google Calendar Sync
 
 Goal: Put important dates where users already check their schedule.
 
@@ -112,7 +132,7 @@ Success criteria:
 - Bills, renewals, expirations, and reminders can be synced to Google Calendar.
 - Calendar events update when tracked items change.
 
-## Phase 7: Automation And Insights
+## Phase 8: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

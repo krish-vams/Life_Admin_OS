@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, and document expiry tracking. Users can register, log in, manage recurring payments, track important document expirations, and view a protected dashboard backed by PostgreSQL.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, and a polished dashboard overview. Users can register, log in, manage recurring payments, track important document expirations, and scan upcoming responsibilities from a protected dashboard backed by PostgreSQL.
 
 ## Current Phase
 
-Phase 3: Document Expiry Tracking
+Phase 4: Dashboard and User Interface
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -18,8 +18,9 @@ Phase 3: Document Expiry Tracking
 - User-scoped subscription CRUD.
 - User-scoped document CRUD.
 - Expiry status tracking for valid, expiring soon, and expired documents.
-- Dashboard summaries for open bills, subscription spend, due bills, and upcoming renewals.
-- Dashboard summary for documents needing attention.
+- Dedicated pages for `/dashboard`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
+- Dashboard summaries for total subscriptions, monthly subscription spend, upcoming bills, and expiring documents.
+- Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
 
 ## Run Locally
 
