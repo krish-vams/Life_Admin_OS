@@ -1,7 +1,6 @@
 import express from "express";
 import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
-import { generateNotifications } from "../services/reminders.js";
 
 const router = express.Router();
 const NOTIFICATION_STATUSES = new Set(["unread", "read", "dismissed"]);
@@ -31,8 +30,6 @@ router.use(requireAuth);
 
 router.get("/", async (req, res, next) => {
   try {
-    await generateNotifications(req.user.sub);
-
     const result = await query(
       `SELECT id, user_id, type, source_id, title, message, scheduled_for, due_on, status, is_read, created_at, updated_at
        FROM notifications
@@ -77,4 +74,3 @@ router.put("/:id/status", async (req, res, next) => {
 });
 
 export default router;
-

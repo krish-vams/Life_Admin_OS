@@ -131,3 +131,53 @@ CREATE TRIGGER notifications_set_updated_at
 BEFORE UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE IF NOT EXISTS gmail_connections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  google_email VARCHAR(255),
+  access_token TEXT,
+  refresh_token TEXT,
+  scope TEXT,
+  token_expiry TIMESTAMPTZ,
+  connected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS gmail_connections_set_updated_at ON gmail_connections;
+
+CREATE TRIGGER gmail_connections_set_updated_at
+BEFORE UPDATE ON gmail_connections
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE IF NOT EXISTS detected_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  source VARCHAR(40) NOT NULL DEFAULT 'gmail',
+  source_email_id VARCHAR(255),
+  type VARCHAR(40) NOT NULL CHECK (type IN ('bill', 'subscription')),
+  name VARCHAR(180) NOT NULL,
+  amount NUMERIC(10, 2),
+  detected_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  suggested_due_date DATE,
+  billing_cycle VARCHAR(40),
+  confidence_score NUMERIC(4, 2) NOT NULL DEFAULT 0.50 CHECK (confidence_score >= 0 AND confidence_score <= 1),
+  status VARCHAR(40) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'ignored')),
+  raw_snippet TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_detected_items_unique_email
+ON detected_items (user_id, source, source_email_id, type);
+
+CREATE INDEX IF NOT EXISTS idx_detected_items_user_status ON detected_items (user_id, status);
+
+DROP TRIGGER IF EXISTS detected_items_set_updated_at ON detected_items;
+
+CREATE TRIGGER detected_items_set_updated_at
+BEFORE UPDATE ON detected_items
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();

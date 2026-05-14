@@ -5,6 +5,7 @@
   "description": "Full-stack personal productivity and life admin platform.",
   "scripts": {
     "dev:backend": "npm --prefix backend run dev",
+    "worker": "npm --prefix backend run worker",
     "dev:frontend": "npm --prefix frontend run dev",
     "start:backend": "npm --prefix backend start",
     "build:frontend": "npm --prefix frontend run build"
@@ -13,4 +14,3 @@
     "node": ">=20"
   }
 }
-

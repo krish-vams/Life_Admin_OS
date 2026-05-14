@@ -102,7 +102,26 @@ Success criteria:
 - The system generates useful reminders before important dates.
 - The user can mark notifications as read or dismiss them.
 
-## Phase 6: Gmail Detection
+## Phase 6: Background Processing
+
+Goal: Handle heavy or scheduled tasks in the background so the main application stays responsive.
+
+Scope:
+
+- Redis-backed BullMQ job queue.
+- Node.js worker service.
+- Daily `check-upcoming-reminders` job.
+- On-demand `scan-user-email` job.
+- `send-notification` job placeholder for future email delivery.
+- API endpoints for queuing reminder checks and Gmail scans.
+
+Success criteria:
+
+- Reminder checks can run outside the web request path.
+- Email scans are queued for a worker instead of blocking the API.
+- The worker can be started separately from the backend server.
+
+## Phase 7: Gmail Integration
 
 Goal: Reduce manual entry by detecting bills, subscriptions, and renewals from Gmail.
 
@@ -111,14 +130,16 @@ Scope:
 - Google OAuth.
 - Gmail read-only integration.
 - Email scanning pipeline for likely bills, subscriptions, receipts, and renewal notices.
+- Basic data extraction for name, amount, detected date, suggested date, billing cycle, and source email.
 - User review flow before detected items are added.
+- Detected items table with pending, confirmed, and ignored statuses.
 
 Success criteria:
 
 - The system suggests likely life-admin items from Gmail.
 - The user stays in control and approves detected items before saving them.
 
-## Phase 7: Google Calendar Sync
+## Phase 8: Google Calendar Sync
 
 Goal: Put important dates where users already check their schedule.
 
@@ -134,7 +155,7 @@ Success criteria:
 - Bills, renewals, expirations, and reminders can be synced to Google Calendar.
 - Calendar events update when tracked items change.
 
-## Phase 8: Automation And Insights
+## Phase 9: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

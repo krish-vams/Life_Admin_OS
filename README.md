@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, and in-app reminders. Users can register, log in, manage recurring payments, track important document expirations, and receive reminder notifications before key dates.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, and Gmail-detected suggestions. Users can register, log in, manage recurring payments, track document expirations, receive reminder notifications, connect Gmail, and review detected bills or subscriptions before confirming them.
 
 ## Current Phase
 
-Phase 5: Reminder and Notification System
+Phase 7: Gmail Integration
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -23,7 +23,10 @@ Phase 5: Reminder and Notification System
 - Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
 - Reminder preferences for bills, subscriptions, and documents.
 - Database-backed notifications with unread, read, and dismissed states.
-- Daily reminder check for upcoming bills, renewals, and document expiries.
+- Redis/BullMQ background queue for reminder checks, email scans, and notification jobs.
+- Gmail OAuth connection flow.
+- Gmail scan jobs that create pending detected-item suggestions.
+- User confirmation workflow for detected bills and subscriptions.
 
 ## Run Locally
 
@@ -44,10 +47,10 @@ psql life_admin_os < database/schema.sql
 Or, if Docker is available:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres redis
 ```
 
-3. Create `.env` from `.env.example` and set `DATABASE_URL` and `JWT_SECRET`.
+3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, and `REDIS_URL`. Gmail scanning also requires Google OAuth values.
 
 4. Start the backend:
 
@@ -59,6 +62,12 @@ npm run dev:backend
 
 ```bash
 npm run dev:frontend
+```
+
+6. Start the background worker:
+
+```bash
+npm run worker
 ```
 
 Then visit:
@@ -89,6 +98,15 @@ http://localhost:5173
 - `DELETE /api/documents/:id`
 - `GET /api/notifications`
 - `PUT /api/notifications/:id/status`
+- `POST /api/jobs/check-upcoming-reminders`
+- `POST /api/jobs/scan-user-email`
+- `GET /api/gmail/status`
+- `GET /api/gmail/auth-url`
+- `GET /api/gmail/callback`
+- `POST /api/gmail/scan`
+- `GET /api/detected-items`
+- `POST /api/detected-items/:id/confirm`
+- `POST /api/detected-items/:id/ignore`
 
 ## Project Docs
 
