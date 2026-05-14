@@ -4,6 +4,7 @@ import { scanUserEmail } from "../services/emailScanner.js";
 import { deliverDueNotifications, deliverNotification } from "../services/notificationDelivery.js";
 import { generateNotifications } from "../services/reminders.js";
 import { JOB_NAMES, JOB_QUEUE_NAME, redisConnection, scheduleDailyReminderCheck } from "../queues/jobQueue.js";
+import { logError, logInfo } from "../utils/logger.js";
 
 await scheduleDailyReminderCheck();
 
@@ -32,11 +33,17 @@ const worker = new Worker(
 );
 
 worker.on("completed", (job) => {
-  console.log(`Completed ${job.name} (${job.id})`);
+  logInfo("Background job completed", {
+    jobId: job.id,
+    jobName: job.name
+  });
 });
 
 worker.on("failed", (job, error) => {
-  console.error(`Failed ${job?.name || "job"} (${job?.id || "unknown"})`, error);
+  logError("Background job failed", error, {
+    jobId: job?.id || "unknown",
+    jobName: job?.name || "job"
+  });
 });
 
-console.log("Life Admin OS worker is running");
+logInfo("Life Admin OS worker is running");

@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import "./config/env.js";
+import { rateLimit } from "./middleware/rateLimiter.js";
 import analyticsRoutes from "./routes/analytics.js";
 import authRoutes from "./routes/auth.js";
 import billRoutes from "./routes/bills.js";
@@ -12,6 +13,7 @@ import notificationRoutes from "./routes/notifications.js";
 import notificationPreferenceRoutes from "./routes/notificationPreferences.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import userRoutes from "./routes/user.js";
+import { logError, logInfo, logWarn } from "./utils/logger.js";
 
 if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET is required");
@@ -25,7 +27,8 @@ app.use(
     origin: process.env.CORS_ORIGIN || "http://localhost:5173"
   })
 );
-app.use(express.json());
+app.use(rateLimit());
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "life-admin-os-api" });
@@ -44,14 +47,29 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/user", userRoutes);
 
 app.use((req, res) => {
-  res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });
+  logWarn("Route not found", {
+    method: req.method,
+    path: req.originalUrl
+  });
+  res.status(404).json({ message: "Route not found." });
 });
 
-app.use((error, _req, res, _next) => {
-  console.error(error);
-  res.status(500).json({ message: "Unexpected server error." });
+app.use((error, req, res, _next) => {
+  logError("API error", error, {
+    method: req.method,
+    path: req.originalUrl,
+    userId: req.user?.sub
+  });
+
+  const statusCode = error.statusCode || error.status || 500;
+  const message =
+    error.publicMessage ||
+    (error.type === "entity.parse.failed" ? "Request body is invalid JSON." : null) ||
+    (statusCode === 413 ? "Request body is too large." : "Unexpected server error.");
+
+  res.status(statusCode).json({ message });
 });
 
 app.listen(port, () => {
-  console.log(`Life Admin OS API listening on port ${port}`);
+  logInfo("Life Admin OS API listening", { port });
 });

@@ -197,7 +197,27 @@ Success criteria:
 - Users cannot download another user's file.
 - The app blocks unsupported file types and oversized uploads.
 
-## Phase 11: Automation And Insights
+## Phase 11: Security, Validation, and Reliability
+
+Goal: Make the application safer, more stable, and closer to production quality.
+
+Scope:
+
+- Shared validation helpers for email addresses, UUIDs, dates, amounts, reminder settings, and text length limits.
+- Backend route guards for malformed owned-record identifiers.
+- Configurable API rate limiting with a default of 100 requests per 15 minutes.
+- Cleaner 404 and API error responses that avoid exposing stack traces or database details.
+- Structured logs for API errors, failed login attempts, blocked auth requests, Gmail connection failures, and background job failures.
+- JSON request body size limit to reduce abuse risk.
+
+Success criteria:
+
+- Invalid user input is rejected before saving.
+- Protected APIs remain authenticated and scoped to the current user.
+- Repeated requests are limited with a clear 429 response.
+- Operational failures are logged without leaking system details to users.
+
+## Phase 12: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

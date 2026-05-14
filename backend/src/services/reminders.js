@@ -1,4 +1,5 @@
 import { query } from "../config/db.js";
+import { logError } from "../utils/logger.js";
 
 function userFilter(userId, column = "user_id") {
   return userId ? `AND ${column} = $1` : "";
@@ -72,11 +73,10 @@ export function startDailyReminderJob() {
     try {
       await generateNotifications();
     } catch (error) {
-      console.error("Daily reminder check failed", error);
+      logError("Daily reminder check failed", error);
     }
   }
 
   run();
   return setInterval(run, oneDayMs);
 }
-

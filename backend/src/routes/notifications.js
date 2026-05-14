@@ -1,10 +1,12 @@
 import express from "express";
 import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { validateUuidParam } from "../middleware/validateRequest.js";
 import { enqueueNotificationSend } from "../queues/jobQueue.js";
 
 const router = express.Router();
 const NOTIFICATION_STATUSES = new Set(["unread", "read", "dismissed"]);
+router.param("id", validateUuidParam("Notification id"));
 
 function toDateString(value) {
   return value instanceof Date ? value.toISOString().slice(0, 10) : value;

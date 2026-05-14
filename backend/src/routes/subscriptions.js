@@ -1,10 +1,18 @@
 import express from "express";
 import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { validateUuidParam } from "../middleware/validateRequest.js";
+import {
+  isValidDate,
+  toLimitedString,
+  toNonNegativeAmount,
+  toNonNegativeInteger
+} from "../utils/validation.js";
 
 const router = express.Router();
 const BILLING_CYCLES = new Set(["weekly", "monthly", "quarterly", "yearly"]);
 const SUBSCRIPTION_STATUSES = new Set(["active", "paused", "cancelled"]);
+router.param("id", validateUuidParam("Subscription id"));
 
 function toDateString(value) {
   return value instanceof Date ? value.toISOString().slice(0, 10) : value;
@@ -29,20 +37,20 @@ function toSubscription(row) {
 
 function validateSubscription(input) {
   const errors = {};
-  const name = String(input.name || "").trim();
-  const amount = Number(input.amount);
+  const name = toLimitedString(input.name, 160);
+  const amount = toNonNegativeAmount(input.amount);
   const billingCycle = String(input.billingCycle || input.billing_cycle || "monthly").trim().toLowerCase();
   const nextRenewalDate = String(input.nextRenewalDate || input.next_renewal_date || "").trim();
-  const reminderDaysBefore = Number(input.reminderDaysBefore ?? input.reminder_days_before ?? 3);
-  const category = String(input.category || "").trim();
+  const reminderDaysBefore = toNonNegativeInteger(input.reminderDaysBefore ?? input.reminder_days_before, 3);
+  const category = toLimitedString(input.category, 80);
   const status = String(input.status || "active").trim().toLowerCase();
-  const notes = String(input.notes || "").trim();
+  const notes = toLimitedString(input.notes, 2000);
 
   if (name.length < 2) {
     errors.name = "Subscription name must be at least 2 characters.";
   }
 
-  if (!Number.isFinite(amount) || amount < 0) {
+  if (amount === null) {
     errors.amount = "Amount must be a valid positive number.";
   }
 
@@ -50,11 +58,11 @@ function validateSubscription(input) {
     errors.billingCycle = "Billing cycle must be weekly, monthly, quarterly, or yearly.";
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(nextRenewalDate)) {
-    errors.nextRenewalDate = "Renewal date must use YYYY-MM-DD.";
+  if (!isValidDate(nextRenewalDate)) {
+    errors.nextRenewalDate = "Renewal date must be a valid YYYY-MM-DD date.";
   }
 
-  if (!Number.isInteger(reminderDaysBefore) || reminderDaysBefore < 0) {
+  if (reminderDaysBefore === null) {
     errors.reminderDaysBefore = "Reminder preference must be zero or more days.";
   }
 

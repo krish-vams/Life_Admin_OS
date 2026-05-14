@@ -2,22 +2,22 @@ import bcrypt from "bcryptjs";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { query } from "../config/db.js";
+import { logWarn } from "../utils/logger.js";
+import { isValidEmail, normalizeEmail, toLimitedString } from "../utils/validation.js";
 
 const router = express.Router();
-
-function normalizeEmail(email) {
-  return String(email || "").trim().toLowerCase();
-}
 
 function validateRegistration({ name, email, password }) {
   const errors = {};
   const normalizedEmail = normalizeEmail(email);
 
-  if (!name || String(name).trim().length < 2) {
+  const normalizedName = toLimitedString(name, 120);
+
+  if (normalizedName.length < 2) {
     errors.name = "Name must be at least 2 characters.";
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+  if (!isValidEmail(normalizedEmail)) {
     errors.email = "Enter a valid email address.";
   }
 
@@ -25,7 +25,7 @@ function validateRegistration({ name, email, password }) {
     errors.password = "Password must be at least 8 characters.";
   }
 
-  return { errors, normalizedEmail };
+  return { errors, normalizedEmail, normalizedName };
 }
 
 function signToken(user) {
@@ -52,7 +52,7 @@ function publicUser(user) {
 router.post("/register", async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
-    const { errors, normalizedEmail } = validateRegistration({ name, email, password });
+    const { errors, normalizedEmail, normalizedName } = validateRegistration({ name, email, password });
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ message: "Registration details are invalid.", errors });
@@ -69,7 +69,7 @@ router.post("/register", async (req, res, next) => {
       `INSERT INTO users (name, email, password_hash)
        VALUES ($1, $2, $3)
        RETURNING id, name, email, created_at, updated_at`,
-      [String(name).trim(), normalizedEmail, passwordHash]
+      [normalizedName, normalizedEmail, passwordHash]
     );
 
     const user = result.rows[0];
@@ -88,7 +88,11 @@ router.post("/login", async (req, res, next) => {
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || "");
 
-    if (!email || !password) {
+    if (!isValidEmail(email) || !password) {
+      logWarn("Failed login attempt", {
+        email,
+        reason: "invalid_input"
+      });
       return res.status(400).json({ message: "Email and password are required." });
     }
 
@@ -102,12 +106,20 @@ router.post("/login", async (req, res, next) => {
     const user = result.rows[0];
 
     if (!user) {
+      logWarn("Failed login attempt", {
+        email,
+        reason: "unknown_email"
+      });
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordMatches) {
+      logWarn("Failed login attempt", {
+        email,
+        reason: "password_mismatch"
+      });
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
@@ -121,4 +133,3 @@ router.post("/login", async (req, res, next) => {
 });
 
 export default router;
-

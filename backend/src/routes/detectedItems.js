@@ -1,8 +1,16 @@
 import express from "express";
 import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { validateUuidParam } from "../middleware/validateRequest.js";
+import {
+  isValidDate,
+  toLimitedString,
+  toNonNegativeAmount
+} from "../utils/validation.js";
 
 const router = express.Router();
+const BILLING_CYCLES = new Set(["weekly", "monthly", "quarterly", "yearly"]);
+router.param("id", validateUuidParam("Detected item id"));
 
 function toDateString(value) {
   return value instanceof Date ? value.toISOString().slice(0, 10) : value;
@@ -63,18 +71,39 @@ router.post("/:id/confirm", async (req, res, next) => {
       return res.status(400).json({ message: "Only pending detected items can be confirmed." });
     }
 
-    const name = String(req.body.name || item.name).trim();
-    const amount = Number(req.body.amount ?? item.amount ?? 0);
+    const name = toLimitedString(req.body.name || item.name, 160);
+    const amount = toNonNegativeAmount(req.body.amount ?? item.amount ?? 0);
     const date = String(req.body.suggestedDueDate || toDateString(item.suggested_due_date) || toDateString(item.detected_date));
-    const category = String(req.body.category || "Imported").trim();
+    const category = toLimitedString(req.body.category || "Imported", 80);
+    const billingCycle = String(req.body.billingCycle || item.billing_cycle || "monthly").trim().toLowerCase();
+
+    if (name.length < 2) {
+      return res.status(400).json({ message: "Name must be at least 2 characters." });
+    }
+
+    if (amount === null) {
+      return res.status(400).json({ message: "Amount must be a valid positive number." });
+    }
+
+    if (!isValidDate(date)) {
+      return res.status(400).json({ message: "Suggested due date must be a valid YYYY-MM-DD date." });
+    }
+
+    if (category.length < 2) {
+      return res.status(400).json({ message: "Category must be at least 2 characters." });
+    }
 
     if (item.type === "subscription") {
+      if (!BILLING_CYCLES.has(billingCycle)) {
+        return res.status(400).json({ message: "Billing cycle must be weekly, monthly, quarterly, or yearly." });
+      }
+
       await query(
         `INSERT INTO subscriptions (
            user_id, name, amount, billing_cycle, next_renewal_date, reminder_days_before, category, status, notes
          )
          VALUES ($1, $2, $3, $4, $5, 3, $6, 'active', $7)`,
-        [req.user.sub, name, amount, req.body.billingCycle || item.billing_cycle || "monthly", date, category, item.raw_snippet]
+        [req.user.sub, name, amount, billingCycle, date, category, item.raw_snippet]
       );
     } else {
       await query(
@@ -119,4 +148,3 @@ router.post("/:id/ignore", async (req, res, next) => {
 });
 
 export default router;
-

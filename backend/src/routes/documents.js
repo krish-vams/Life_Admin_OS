@@ -1,6 +1,7 @@
 import express from "express";
 import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { validateUuidParam } from "../middleware/validateRequest.js";
 import {
   createDocumentDownloadUrl,
   deleteStoredDocument,
@@ -10,8 +11,10 @@ import {
   uploadDocumentFile,
   verifyDocumentDownloadToken
 } from "../services/documentStorage.js";
+import { isValidDate, toLimitedString, toNonNegativeInteger } from "../utils/validation.js";
 
 const router = express.Router();
+router.param("id", validateUuidParam("Document id"));
 const documentFields = `id, user_id, name, document_type, expiry_date, reminder_days_before, status, notes,
   file_url, file_type, file_size, storage_key, uploaded_at, created_at, updated_at`;
 
@@ -65,11 +68,11 @@ function toDocument(row) {
 
 function validateDocument(input) {
   const errors = {};
-  const name = String(input.name || "").trim();
-  const documentType = String(input.documentType || input.document_type || "").trim();
+  const name = toLimitedString(input.name, 160);
+  const documentType = toLimitedString(input.documentType || input.document_type, 100);
   const expiryDate = String(input.expiryDate || input.expiry_date || "").trim();
-  const reminderDaysBefore = Number(input.reminderDaysBefore ?? input.reminder_days_before ?? 30);
-  const notes = String(input.notes || "").trim();
+  const reminderDaysBefore = toNonNegativeInteger(input.reminderDaysBefore ?? input.reminder_days_before, 30);
+  const notes = toLimitedString(input.notes, 2000);
 
   if (name.length < 2) {
     errors.name = "Document name must be at least 2 characters.";
@@ -79,11 +82,11 @@ function validateDocument(input) {
     errors.documentType = "Document type must be at least 2 characters.";
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(expiryDate)) {
-    errors.expiryDate = "Expiry date must use YYYY-MM-DD.";
+  if (!isValidDate(expiryDate)) {
+    errors.expiryDate = "Expiry date must be a valid YYYY-MM-DD date.";
   }
 
-  if (!Number.isInteger(reminderDaysBefore) || reminderDaysBefore < 0) {
+  if (reminderDaysBefore === null) {
     errors.reminderDaysBefore = "Reminder preference must be zero or more days.";
   }
 

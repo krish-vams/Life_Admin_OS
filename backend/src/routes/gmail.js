@@ -4,6 +4,7 @@ import { query } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { enqueueEmailScan } from "../queues/jobQueue.js";
 import { createGmailAuthUrl, getOAuthClient, verifyGmailState } from "../services/googleAuth.js";
+import { logError } from "../utils/logger.js";
 
 const router = express.Router();
 
@@ -35,6 +36,10 @@ router.get("/auth-url", requireAuth, (req, res, next) => {
 
 router.get("/callback", async (req, res, next) => {
   try {
+    if (!req.query.code || !req.query.state) {
+      return res.status(400).json({ message: "Google OAuth callback is missing required details." });
+    }
+
     const userId = verifyGmailState(req.query.state);
     const oauthClient = getOAuthClient();
     const { tokens } = await oauthClient.getToken(req.query.code);
@@ -69,6 +74,7 @@ router.get("/callback", async (req, res, next) => {
 
     return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/settings?gmail=connected`);
   } catch (error) {
+    logError("Gmail connection failed", error);
     return next(error);
   }
 });
@@ -83,4 +89,3 @@ router.post("/scan", requireAuth, async (req, res, next) => {
 });
 
 export default router;
-
