@@ -237,7 +237,28 @@ Success criteria:
 - Reminder generation behavior has integration coverage.
 - Frontend business calculations have automated coverage.
 
-## Phase 13: Automation And Insights
+## Phase 13: Deployment and Production Setup
+
+Goal: Prepare the application to run online with public frontend and backend URLs.
+
+Scope:
+
+- Production Dockerfiles for backend API and frontend static app.
+- Docker Compose production-style services for backend, worker, PostgreSQL, Redis, and document storage volume.
+- Vercel and Netlify frontend deployment configuration.
+- Render and Railway backend deployment starter configuration.
+- Deployment guide covering frontend, backend, worker, database, Redis, document storage, and production environment variables.
+- Deployment readiness script that runs tests and a frontend production build.
+- Frontend environment example for `VITE_API_BASE_URL`.
+
+Success criteria:
+
+- The project has documented production environment variables.
+- The frontend can be deployed to a static host with API URL configuration.
+- The backend API and worker have clear production start commands.
+- PostgreSQL, Redis, and document storage setup are documented for production providers.
+
+## Phase 14: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

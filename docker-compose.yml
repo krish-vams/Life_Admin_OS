@@ -1,4 +1,46 @@
 services:
+  backend:
+    build:
+      context: ./backend
+    container_name: life-admin-os-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/life_admin_os
+      JWT_SECRET: replace-with-a-long-random-secret
+      JWT_EXPIRES_IN: 7d
+      PORT: 4000
+      CORS_ORIGIN: http://localhost:5173
+      FRONTEND_URL: http://localhost:5173
+      REDIS_URL: redis://redis:6379
+      DOCUMENT_STORAGE_DIR: /app/storage/documents
+      DOCUMENT_SIGNING_SECRET: replace-with-document-download-secret
+      RATE_LIMIT_MAX_REQUESTS: 100
+      RATE_LIMIT_WINDOW_MS: 900000
+    ports:
+      - "4000:4000"
+    volumes:
+      - document_storage:/app/storage
+
+  worker:
+    build:
+      context: ./backend
+    container_name: life-admin-os-worker
+    restart: unless-stopped
+    command: npm run worker
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/life_admin_os
+      JWT_SECRET: replace-with-a-long-random-secret
+      REDIS_URL: redis://redis:6379
+      FRONTEND_URL: http://localhost:5173
+
   postgres:
     image: postgres:16-alpine
     container_name: life-admin-os-postgres
@@ -22,3 +64,4 @@ services:
 
 volumes:
   postgres_data:
+  document_storage:

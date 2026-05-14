@@ -9,6 +9,9 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "start:backend": "npm --prefix backend start",
     "build:frontend": "npm --prefix frontend run build",
+    "build": "npm --prefix frontend run build",
+    "start:worker": "npm --prefix backend run worker",
+    "deploy:check": "npm test && npm run build:frontend",
     "test": "npm --prefix backend test && npm --prefix frontend test"
   },
   "engines": {
