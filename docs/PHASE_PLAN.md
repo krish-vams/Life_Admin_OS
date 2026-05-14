@@ -159,21 +159,23 @@ Success criteria:
 - Users can estimate upcoming payments.
 - Users receive simple duplicate subscription and renewal pattern insights.
 
-## Phase 9: Google Calendar Sync
+## Phase 9: Google Calendar and Email Notifications
 
-Goal: Put important dates where users already check their schedule.
+Goal: Extend reminders outside the app through email and Google Calendar.
 
 Scope:
 
-- Google Calendar OAuth scopes.
-- Calendar event creation and update flow.
-- Calendar sync status per item.
-- Conflict handling when dates change.
+- Google Calendar event creation for bills, renewals, and document expiry reminders.
+- SMTP-backed reminder email delivery.
+- Notification delivery preferences: in-app only, email reminder, calendar event, or all reminders.
+- Worker-backed delivery through the `send-notification` job.
+- Delivery metadata on notifications for email and calendar sync status.
 
 Success criteria:
 
-- Bills, renewals, expirations, and reminders can be synced to Google Calendar.
-- Calendar events update when tracked items change.
+- Users can choose how reminders are delivered.
+- The worker can send email reminders when SMTP is configured.
+- The worker can create Google Calendar events when Google is connected with Calendar permission.
 
 ## Phase 10: Automation And Insights
 

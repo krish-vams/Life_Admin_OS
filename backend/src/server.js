@@ -9,6 +9,7 @@ import documentRoutes from "./routes/documents.js";
 import gmailRoutes from "./routes/gmail.js";
 import jobRoutes from "./routes/jobs.js";
 import notificationRoutes from "./routes/notifications.js";
+import notificationPreferenceRoutes from "./routes/notificationPreferences.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import userRoutes from "./routes/user.js";
 
@@ -38,6 +39,7 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/gmail", gmailRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/notification-preferences", notificationPreferenceRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/user", userRoutes);
 

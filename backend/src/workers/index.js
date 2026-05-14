@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import "../config/env.js";
-import { query } from "../config/db.js";
 import { scanUserEmail } from "../services/emailScanner.js";
+import { deliverDueNotifications, deliverNotification } from "../services/notificationDelivery.js";
 import { generateNotifications } from "../services/reminders.js";
 import { JOB_NAMES, JOB_QUEUE_NAME, redisConnection, scheduleDailyReminderCheck } from "../queues/jobQueue.js";
 
@@ -12,7 +12,8 @@ const worker = new Worker(
   async (job) => {
     if (job.name === JOB_NAMES.CHECK_UPCOMING_REMINDERS) {
       await generateNotifications();
-      return { ok: true };
+      const deliveredCount = await deliverDueNotifications();
+      return { deliveredCount };
     }
 
     if (job.name === JOB_NAMES.SCAN_USER_EMAIL) {
@@ -21,8 +22,8 @@ const worker = new Worker(
     }
 
     if (job.name === JOB_NAMES.SEND_NOTIFICATION) {
-      await query("UPDATE notifications SET status = status WHERE id = $1", [job.data.notificationId]);
-      return { ok: true };
+      const result = await deliverNotification(job.data.notificationId);
+      return result;
     }
 
     throw new Error(`Unsupported job: ${job.name}`);
@@ -39,4 +40,3 @@ worker.on("failed", (job, error) => {
 });
 
 console.log("Life Admin OS worker is running");
-

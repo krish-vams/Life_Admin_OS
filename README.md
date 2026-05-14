@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, and analytics. Users can register, log in, manage recurring payments, track document expirations, receive reminders, connect Gmail, review detected bills or subscriptions, and understand recurring spending patterns.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, and Google Calendar sync. Users can register, log in, manage recurring payments, track document expirations, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
 
 ## Current Phase
 
-Phase 8: Smart Insights and Analytics
+Phase 9: Google Calendar and Email Notifications
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -28,6 +28,9 @@ Phase 8: Smart Insights and Analytics
 - Gmail scan jobs that create pending detected-item suggestions.
 - User confirmation workflow for detected bills and subscriptions.
 - Analytics for monthly subscription total, category spending, upcoming expenses, duplicate subscription alerts, and renewal predictions.
+- Reminder delivery preferences for in-app only, email, calendar event, or all reminders.
+- SMTP-backed email reminder delivery.
+- Google Calendar event creation for due dates and expiries.
 
 ## Run Locally
 
@@ -51,7 +54,7 @@ Or, if Docker is available:
 docker compose up -d postgres redis
 ```
 
-3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, and `REDIS_URL`. Gmail scanning also requires Google OAuth values.
+3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, and `REDIS_URL`. Gmail scanning and Calendar sync require Google OAuth values. Email reminders require SMTP values.
 
 4. Start the backend:
 
@@ -100,6 +103,9 @@ http://localhost:5173
 - `DELETE /api/documents/:id`
 - `GET /api/notifications`
 - `PUT /api/notifications/:id/status`
+- `POST /api/notifications/:id/send`
+- `GET /api/notification-preferences`
+- `PUT /api/notification-preferences`
 - `POST /api/jobs/check-upcoming-reminders`
 - `POST /api/jobs/scan-user-email`
 - `GET /api/gmail/status`

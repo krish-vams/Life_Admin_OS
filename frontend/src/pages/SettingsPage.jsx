@@ -19,6 +19,7 @@ function Field({ label, ...props }) {
 export default function SettingsPage() {
   const { token, user } = useAuth();
   const [gmailStatus, setGmailStatus] = useState({ connected: false, connection: null });
+  const [preferences, setPreferences] = useState({ deliveryMethod: "in_app" });
   const [detectedItems, setDetectedItems] = useState([]);
   const [edits, setEdits] = useState({});
   const [message, setMessage] = useState("");
@@ -33,13 +34,15 @@ export default function SettingsPage() {
       setError("");
 
       try {
-        const [gmailData, detectedData] = await Promise.all([
+        const [gmailData, preferenceData, detectedData] = await Promise.all([
           apiRequest("/api/gmail/status", { token }),
+          apiRequest("/api/notification-preferences", { token }),
           apiRequest("/api/detected-items", { token })
         ]);
 
         if (isMounted) {
           setGmailStatus(gmailData);
+          setPreferences(preferenceData.preferences);
           setDetectedItems(detectedData.detectedItems);
           setEdits(
             Object.fromEntries(
@@ -97,6 +100,24 @@ export default function SettingsPage() {
     try {
       await apiRequest("/api/gmail/scan", { method: "POST", token });
       setMessage("Email scan job queued. Refresh this page after the worker processes it.");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
+  async function savePreferences(event) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    try {
+      const data = await apiRequest("/api/notification-preferences", {
+        method: "PUT",
+        token,
+        body: preferences
+      });
+      setPreferences(data.preferences);
+      setMessage("Reminder delivery preferences saved.");
     } catch (requestError) {
       setError(requestError.message);
     }
@@ -176,9 +197,9 @@ export default function SettingsPage() {
         <section className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div>
-              <h2 className="text-xl font-black">Gmail integration</h2>
+              <h2 className="text-xl font-black">Google integration</h2>
               <p className="mt-2 text-sm font-semibold leading-6 text-black/60">
-                Connect Gmail to scan recent emails for bills, subscriptions, receipts, and renewal notices.
+                Connect Google to scan Gmail and sync reminder dates to Google Calendar.
               </p>
             </div>
             <div className="flex gap-2">
@@ -187,7 +208,7 @@ export default function SettingsPage() {
                 onClick={connectGmail}
                 type="button"
               >
-                {gmailStatus.connected ? "Reconnect" : "Connect Gmail"}
+                {gmailStatus.connected ? "Reconnect" : "Connect Google"}
               </button>
               <button
                 className="h-10 rounded-app border border-black/10 bg-white px-4 text-sm font-black disabled:opacity-50"
@@ -201,11 +222,38 @@ export default function SettingsPage() {
           </div>
           <div className="mt-4 rounded-app bg-sage p-4 text-sm font-bold text-black/65">
             {gmailStatus.connected
-              ? `Connected to ${gmailStatus.connection?.google_email || "Gmail"}`
-              : "Gmail is not connected yet."}
+              ? `Connected to ${gmailStatus.connection?.google_email || "Google"}`
+              : "Google is not connected yet."}
           </div>
         </section>
       </div>
+
+      <section className="mt-5 rounded-app border border-black/10 bg-white p-5 shadow-soft">
+        <div className="mb-5">
+          <h2 className="text-xl font-black">Reminder delivery</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-black/60">
+            Choose how reminders should reach you when the background worker processes due notifications.
+          </p>
+        </div>
+        <form className="grid gap-4 md:grid-cols-[1fr_auto]" onSubmit={savePreferences}>
+          <label className="grid gap-2 text-sm font-black text-black/70">
+            <span>Notification preference</span>
+            <select
+              className="h-11 rounded-app border border-black/10 bg-sage px-3 text-sm font-semibold outline-none focus:border-teal focus:ring-4 focus:ring-teal/15"
+              onChange={(event) => setPreferences({ deliveryMethod: event.target.value })}
+              value={preferences.deliveryMethod}
+            >
+              <option value="in_app">In-app only</option>
+              <option value="email">Email reminder</option>
+              <option value="calendar">Calendar event</option>
+              <option value="all">All reminders</option>
+            </select>
+          </label>
+          <button className="h-11 self-end rounded-app bg-moss px-4 text-sm font-black text-white" type="submit">
+            Save Preference
+          </button>
+        </form>
+      </section>
 
       <section className="mt-5 rounded-app border border-black/10 bg-white p-5 shadow-soft">
         <div className="mb-5 flex items-start justify-between gap-4">
@@ -322,4 +370,3 @@ export default function SettingsPage() {
     </AppShell>
   );
 }
-

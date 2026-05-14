@@ -132,6 +132,25 @@ BEFORE UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
+ALTER TABLE IF EXISTS notifications
+ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS calendar_event_id TEXT,
+ADD COLUMN IF NOT EXISTS calendar_synced_at TIMESTAMPTZ;
+
+CREATE TABLE IF NOT EXISTS notification_preferences (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  delivery_method VARCHAR(40) NOT NULL DEFAULT 'in_app' CHECK (delivery_method IN ('in_app', 'email', 'calendar', 'all')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS notification_preferences_set_updated_at ON notification_preferences;
+
+CREATE TRIGGER notification_preferences_set_updated_at
+BEFORE UPDATE ON notification_preferences
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
 CREATE TABLE IF NOT EXISTS gmail_connections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
