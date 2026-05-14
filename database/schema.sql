@@ -90,9 +90,21 @@ CREATE TABLE IF NOT EXISTS documents (
   reminder_days_before INTEGER NOT NULL DEFAULT 30 CHECK (reminder_days_before >= 0),
   status VARCHAR(40) NOT NULL DEFAULT 'valid' CHECK (status IN ('valid', 'expiring_soon', 'expired')),
   notes TEXT,
+  file_url TEXT,
+  file_type VARCHAR(120),
+  file_size INTEGER CHECK (file_size IS NULL OR file_size >= 0),
+  storage_key TEXT,
+  uploaded_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE IF EXISTS documents
+ADD COLUMN IF NOT EXISTS file_url TEXT,
+ADD COLUMN IF NOT EXISTS file_type VARCHAR(120),
+ADD COLUMN IF NOT EXISTS file_size INTEGER CHECK (file_size IS NULL OR file_size >= 0),
+ADD COLUMN IF NOT EXISTS storage_key TEXT,
+ADD COLUMN IF NOT EXISTS uploaded_at TIMESTAMPTZ;
 
 CREATE INDEX IF NOT EXISTS idx_documents_user_expiry ON documents (user_id, expiry_date);
 CREATE INDEX IF NOT EXISTS idx_documents_user_status ON documents (user_id, status);

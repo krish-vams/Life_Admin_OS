@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { apiRequest } from "../api/client.js";
+import { API_BASE_URL, apiRequest } from "../api/client.js";
 import { useAuth } from "../state/AuthContext.jsx";
 
 const billDefaults = {
@@ -84,6 +84,20 @@ function formatCurrency(value) {
     style: "currency",
     currency: "USD"
   }).format(Number(value || 0));
+}
+
+function formatFileSize(bytes) {
+  const value = Number(bytes || 0);
+
+  if (!value) {
+    return "Unknown size";
+  }
+
+  if (value >= 1024 * 1024) {
+    return `${(value / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  return `${Math.max(1, Math.round(value / 1024))} KB`;
 }
 
 function daysUntil(dateValue) {
@@ -215,6 +229,8 @@ export default function ManagePage({ initialPanel = "bills" }) {
   const [isSavingBill, setIsSavingBill] = useState(false);
   const [isSavingSubscription, setIsSavingSubscription] = useState(false);
   const [isSavingDocument, setIsSavingDocument] = useState(false);
+  const [documentFiles, setDocumentFiles] = useState({});
+  const [uploadingDocumentId, setUploadingDocumentId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
 
@@ -480,6 +496,63 @@ export default function ManagePage({ initialPanel = "bills" }) {
     }
   }
 
+  function selectDocumentFile(documentId, file) {
+    setDocumentFiles((current) => ({ ...current, [documentId]: file }));
+  }
+
+  async function uploadDocumentFile(documentId) {
+    const file = documentFiles[documentId];
+
+    if (!file) {
+      setError("Choose a PDF, JPG, or PNG file before uploading.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    setUploadingDocumentId(documentId);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/documents/${documentId}/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "Document upload failed.");
+      }
+
+      setDocuments((current) =>
+        sortDocuments(current.map((document) => (document.id === documentId ? data.document : document)))
+      );
+      setDocumentFiles((current) => {
+        const next = { ...current };
+        delete next[documentId];
+        return next;
+      });
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setUploadingDocumentId(null);
+    }
+  }
+
+  async function downloadDocumentFile(documentId) {
+    setError("");
+
+    try {
+      const data = await apiRequest(`/api/documents/${documentId}/download-url`, { token });
+      window.open(`${API_BASE_URL}${data.url}`, "_blank", "noopener,noreferrer");
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
   const profileRows = [
     { label: "Name", value: user?.name },
     { label: "Email", value: user?.email },
@@ -509,7 +582,9 @@ export default function ManagePage({ initialPanel = "bills" }) {
       document.status,
       document.notes,
       document.expiryDate,
-      document.reminderDaysBefore
+      document.reminderDaysBefore,
+      document.fileType,
+      document.hasFile ? "uploaded" : "missing file"
     ])
   );
 
@@ -1100,7 +1175,7 @@ export default function ManagePage({ initialPanel = "bills" }) {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-black uppercase text-black/45">Documents</p>
-                  <h2 className="mt-1 text-2xl font-black">Expiry tracking</h2>
+                  <h2 className="mt-1 text-2xl font-black">Document vault</h2>
                 </div>
                 <span className="rounded-full bg-teal/10 px-3 py-1 text-xs font-black text-teal">
                   {filteredDocuments.length} shown
@@ -1144,6 +1219,50 @@ export default function ManagePage({ initialPanel = "bills" }) {
                           {document.notes ? (
                             <p className="mt-2 text-sm leading-6 text-black/60">{document.notes}</p>
                           ) : null}
+                          <div className="mt-4 grid gap-3 rounded-app border border-black/10 bg-white p-3">
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                              <div>
+                                <p className="text-xs font-black uppercase text-black/45">Stored file</p>
+                                <p className="mt-1 text-sm font-bold text-black/60">
+                                  {document.hasFile
+                                    ? `${document.fileType} | ${formatFileSize(document.fileSize)} | Uploaded ${formatDateTime(
+                                        document.uploadedAt
+                                      )}`
+                                    : "No file uploaded yet"}
+                                </p>
+                              </div>
+                              {document.hasFile ? (
+                                <button
+                                  className="h-9 rounded-app border border-black/10 bg-sage px-3 text-xs font-black transition hover:border-moss hover:bg-moss hover:text-white"
+                                  onClick={() => downloadDocumentFile(document.id)}
+                                  type="button"
+                                >
+                                  Download
+                                </button>
+                              ) : null}
+                            </div>
+                            <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+                              <input
+                                accept=".pdf,image/jpeg,image/png"
+                                className="min-h-11 rounded-app border border-black/10 bg-sage px-3 py-2 text-sm font-bold text-black/60 file:mr-3 file:rounded-app file:border-0 file:bg-white file:px-3 file:py-2 file:text-xs file:font-black file:text-ink"
+                                onChange={(event) => selectDocumentFile(document.id, event.target.files?.[0] || null)}
+                                type="file"
+                              />
+                              <button
+                                className="h-11 rounded-app bg-moss px-4 text-sm font-black text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={uploadingDocumentId === document.id || !documentFiles[document.id]}
+                                onClick={() => uploadDocumentFile(document.id)}
+                                type="button"
+                              >
+                                {uploadingDocumentId === document.id
+                                  ? "Uploading..."
+                                  : document.hasFile
+                                    ? "Replace File"
+                                    : "Upload File"}
+                              </button>
+                            </div>
+                            <p className="text-xs font-bold text-black/45">PDF, JPG, or PNG. Maximum size: 10 MB.</p>
+                          </div>
                         </div>
                         <div className="flex gap-2 md:justify-end">
                           <button

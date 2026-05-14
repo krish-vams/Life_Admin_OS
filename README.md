@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, and Google Calendar sync. Users can register, log in, manage recurring payments, track document expirations, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, secure document uploads, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, and Google Calendar sync. Users can register, log in, manage recurring payments, track document expirations, store important files, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
 
 ## Current Phase
 
-Phase 9: Google Calendar and Email Notifications
+Phase 10: Document Vault and File Uploads
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -18,6 +18,9 @@ Phase 9: Google Calendar and Email Notifications
 - User-scoped subscription CRUD.
 - User-scoped document CRUD.
 - Expiry status tracking for valid, expiring soon, and expired documents.
+- PDF, JPG, and PNG file uploads for document records.
+- Protected signed download links for stored document files.
+- Document file metadata for type, size, storage key, and upload date.
 - Dedicated pages for `/dashboard`, `/analytics`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
 - Dashboard summaries for total subscriptions, monthly subscription spend, upcoming bills, and expiring documents.
 - Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
@@ -54,7 +57,7 @@ Or, if Docker is available:
 docker compose up -d postgres redis
 ```
 
-3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, and `REDIS_URL`. Gmail scanning and Calendar sync require Google OAuth values. Email reminders require SMTP values.
+3. Create `.env` from `.env.example` and set `DATABASE_URL`, `JWT_SECRET`, `DOCUMENT_SIGNING_SECRET`, `DOCUMENT_STORAGE_DIR`, and `REDIS_URL`. Gmail scanning and Calendar sync require Google OAuth values. Email reminders require SMTP values.
 
 4. Start the backend:
 
@@ -100,6 +103,9 @@ http://localhost:5173
 - `GET /api/documents`
 - `GET /api/documents/:id`
 - `PUT /api/documents/:id`
+- `POST /api/documents/:id/upload`
+- `GET /api/documents/:id/download-url`
+- `GET /api/documents/:id/download`
 - `DELETE /api/documents/:id`
 - `GET /api/notifications`
 - `PUT /api/notifications/:id/status`

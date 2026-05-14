@@ -177,7 +177,27 @@ Success criteria:
 - The worker can send email reminders when SMTP is configured.
 - The worker can create Google Calendar events when Google is connected with Calendar permission.
 
-## Phase 10: Automation And Insights
+## Phase 10: Document Vault and File Uploads
+
+Goal: Allow users to upload and securely store important document files.
+
+Scope:
+
+- PDF, JPG, and PNG uploads for tracked documents.
+- Configurable storage directory that can be replaced by cloud storage later.
+- User-owned file access through protected signed download links.
+- File type validation and upload size limits.
+- Document metadata for file URL, file type, file size, storage key, and upload date.
+- Document delete and replace workflows that clean up stored files.
+
+Success criteria:
+
+- A logged-in user can upload a file for a document.
+- A logged-in user can replace or download their own document file.
+- Users cannot download another user's file.
+- The app blocks unsupported file types and oversized uploads.
+
+## Phase 11: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 
