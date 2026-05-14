@@ -533,6 +533,7 @@ export default function ManagePage({ initialPanel = "bills" }) {
             <nav className="flex overflow-x-auto rounded-app border border-black/10 bg-sage p-1">
               {[
                 ["/dashboard", "Dashboard"],
+                ["/analytics", "Analytics"],
                 ["/bills", "Bills"],
                 ["/subscriptions", "Subscriptions"],
                 ["/documents", "Documents"],

@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import "./config/env.js";
+import analyticsRoutes from "./routes/analytics.js";
 import authRoutes from "./routes/auth.js";
 import billRoutes from "./routes/bills.js";
 import detectedItemRoutes from "./routes/detectedItems.js";
@@ -29,6 +30,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "life-admin-os-api" });
 });
 
+app.use("/api/analytics", analyticsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/detected-items", detectedItemRoutes);

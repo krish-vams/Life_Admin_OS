@@ -3,6 +3,7 @@ import { useAuth } from "../state/AuthContext.jsx";
 
 const navItems = [
   ["/dashboard", "Dashboard"],
+  ["/analytics", "Analytics"],
   ["/bills", "Bills"],
   ["/subscriptions", "Subscriptions"],
   ["/documents", "Documents"],
@@ -64,4 +65,3 @@ export default function AppShell({ eyebrow, title, subtitle, children }) {
     </main>
   );
 }
-

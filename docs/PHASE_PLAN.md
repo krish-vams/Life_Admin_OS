@@ -139,7 +139,27 @@ Success criteria:
 - The system suggests likely life-admin items from Gmail.
 - The user stays in control and approves detected items before saving them.
 
-## Phase 8: Google Calendar Sync
+## Phase 8: Smart Insights and Analytics
+
+Goal: Help users understand their spending and responsibilities better.
+
+Scope:
+
+- Monthly subscription total.
+- Subscription spending grouped by category.
+- Upcoming expense summaries for the next 7, 15, and 30 days.
+- Duplicate subscription alerts for categories with multiple active subscriptions.
+- Renewal pattern predictions based on each subscription billing cycle.
+- Dedicated analytics page.
+
+Success criteria:
+
+- Users can see how much they spend on subscriptions each month.
+- Users can compare subscription spending by category.
+- Users can estimate upcoming payments.
+- Users receive simple duplicate subscription and renewal pattern insights.
+
+## Phase 9: Google Calendar Sync
 
 Goal: Put important dates where users already check their schedule.
 
@@ -155,7 +175,7 @@ Success criteria:
 - Bills, renewals, expirations, and reminders can be synced to Google Calendar.
 - Calendar events update when tracked items change.
 
-## Phase 9: Automation And Insights
+## Phase 10: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

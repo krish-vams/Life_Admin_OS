@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, and Gmail-detected suggestions. Users can register, log in, manage recurring payments, track document expirations, receive reminder notifications, connect Gmail, and review detected bills or subscriptions before confirming them.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, and analytics. Users can register, log in, manage recurring payments, track document expirations, receive reminders, connect Gmail, review detected bills or subscriptions, and understand recurring spending patterns.
 
 ## Current Phase
 
-Phase 7: Gmail Integration
+Phase 8: Smart Insights and Analytics
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -18,7 +18,7 @@ Phase 7: Gmail Integration
 - User-scoped subscription CRUD.
 - User-scoped document CRUD.
 - Expiry status tracking for valid, expiring soon, and expired documents.
-- Dedicated pages for `/dashboard`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
+- Dedicated pages for `/dashboard`, `/analytics`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
 - Dashboard summaries for total subscriptions, monthly subscription spend, upcoming bills, and expiring documents.
 - Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
 - Reminder preferences for bills, subscriptions, and documents.
@@ -27,6 +27,7 @@ Phase 7: Gmail Integration
 - Gmail OAuth connection flow.
 - Gmail scan jobs that create pending detected-item suggestions.
 - User confirmation workflow for detected bills and subscriptions.
+- Analytics for monthly subscription total, category spending, upcoming expenses, duplicate subscription alerts, and renewal predictions.
 
 ## Run Locally
 
@@ -80,6 +81,7 @@ http://localhost:5173
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `GET /api/analytics/summary`
 - `GET /api/user/profile`
 - `POST /api/bills`
 - `GET /api/bills`
