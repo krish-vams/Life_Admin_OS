@@ -44,7 +44,27 @@ Success criteria:
 - The dashboard highlights bills due in the next 14 days.
 - The dashboard highlights subscription renewals in the next 30 days.
 
-## Phase 3: Smart Reminders
+## Phase 3: Document Expiry Tracking
+
+Goal: Help users track important documents and their expiry dates.
+
+Scope:
+
+- Documents with name, document type, expiry date, reminder preference, status, and notes.
+- Document create, read, update, and delete APIs.
+- Expiry statuses: valid, expiring soon, and expired.
+- Expiring soon logic for documents within 30 days of expiry.
+- User-scoped database table for documents.
+- Dashboard summary for documents that need attention.
+
+Success criteria:
+
+- A logged-in user can add, edit, delete, and view documents.
+- Records are scoped to the authenticated user.
+- The dashboard clearly shows expired and expiring soon documents.
+- Document status is derived from the expiry date.
+
+## Phase 4: Smart Reminders
 
 Goal: Turn tracked items into an active reminder system.
 
@@ -60,7 +80,7 @@ Success criteria:
 - The user can configure reminder timing.
 - The system can identify overdue and upcoming items automatically.
 
-## Phase 4: Gmail Detection
+## Phase 5: Gmail Detection
 
 Goal: Reduce manual entry by detecting bills, subscriptions, and renewals from Gmail.
 
@@ -76,7 +96,7 @@ Success criteria:
 - The system suggests likely life-admin items from Gmail.
 - The user stays in control and approves detected items before saving them.
 
-## Phase 5: Google Calendar Sync
+## Phase 6: Google Calendar Sync
 
 Goal: Put important dates where users already check their schedule.
 
@@ -92,7 +112,7 @@ Success criteria:
 - Bills, renewals, expirations, and reminders can be synced to Google Calendar.
 - Calendar events update when tracked items change.
 
-## Phase 6: Automation And Insights
+## Phase 7: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

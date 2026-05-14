@@ -72,3 +72,26 @@ CREATE TRIGGER subscriptions_set_updated_at
 BEFORE UPDATE ON subscriptions
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE IF NOT EXISTS documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(160) NOT NULL,
+  document_type VARCHAR(100) NOT NULL,
+  expiry_date DATE NOT NULL,
+  reminder_days_before INTEGER NOT NULL DEFAULT 30 CHECK (reminder_days_before >= 0),
+  status VARCHAR(40) NOT NULL DEFAULT 'valid' CHECK (status IN ('valid', 'expiring_soon', 'expired')),
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_documents_user_expiry ON documents (user_id, expiry_date);
+CREATE INDEX IF NOT EXISTS idx_documents_user_status ON documents (user_id, status);
+
+DROP TRIGGER IF EXISTS documents_set_updated_at ON documents;
+
+CREATE TRIGGER documents_set_updated_at
+BEFORE UPDATE ON documents
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();

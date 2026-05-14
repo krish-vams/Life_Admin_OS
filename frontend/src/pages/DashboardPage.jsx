@@ -21,6 +21,14 @@ const subscriptionDefaults = {
   notes: ""
 };
 
+const documentDefaults = {
+  name: "",
+  documentType: "Passport",
+  expiryDate: "",
+  reminderDaysBefore: "30",
+  notes: ""
+};
+
 const billStatuses = [
   ["upcoming", "Upcoming"],
   ["paid", "Paid"],
@@ -75,6 +83,38 @@ function daysUntil(dateValue) {
   return Math.ceil((target - today) / 86400000);
 }
 
+function relativeDateLabel(dateValue) {
+  const days = daysUntil(dateValue);
+
+  if (days < 0) {
+    return `Expired ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago`;
+  }
+
+  if (days === 0) {
+    return "Today";
+  }
+
+  return `${days} day${days === 1 ? "" : "s"}`;
+}
+
+function readableStatus(value) {
+  return String(value || "")
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function documentStatusClass(status) {
+  if (status === "expired") {
+    return "bg-coral/10 text-coral";
+  }
+
+  if (status === "expiring_soon") {
+    return "bg-amber-100 text-amber-700";
+  }
+
+  return "bg-teal/10 text-teal";
+}
+
 function monthlySubscriptionAmount(subscription) {
   const amount = Number(subscription.amount || 0);
 
@@ -96,6 +136,10 @@ function sortBills(items) {
 
 function sortSubscriptions(items) {
   return [...items].sort((a, b) => a.nextRenewalDate.localeCompare(b.nextRenewalDate));
+}
+
+function sortDocuments(items) {
+  return [...items].sort((a, b) => a.expiryDate.localeCompare(b.expiryDate));
 }
 
 function TextInput({ label, ...props }) {
@@ -149,14 +193,18 @@ export default function DashboardPage() {
   const { token, user, logout } = useAuth();
   const [bills, setBills] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [billForm, setBillForm] = useState(billDefaults);
   const [subscriptionForm, setSubscriptionForm] = useState(subscriptionDefaults);
+  const [documentForm, setDocumentForm] = useState(documentDefaults);
   const [editingBillId, setEditingBillId] = useState(null);
   const [editingSubscriptionId, setEditingSubscriptionId] = useState(null);
+  const [editingDocumentId, setEditingDocumentId] = useState(null);
   const [activePanel, setActivePanel] = useState("bills");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingBill, setIsSavingBill] = useState(false);
   const [isSavingSubscription, setIsSavingSubscription] = useState(false);
+  const [isSavingDocument, setIsSavingDocument] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -167,14 +215,16 @@ export default function DashboardPage() {
       setError("");
 
       try {
-        const [billData, subscriptionData] = await Promise.all([
+        const [billData, subscriptionData, documentData] = await Promise.all([
           apiRequest("/api/bills", { token }),
-          apiRequest("/api/subscriptions", { token })
+          apiRequest("/api/subscriptions", { token }),
+          apiRequest("/api/documents", { token })
         ]);
 
         if (isMounted) {
           setBills(billData.bills);
           setSubscriptions(subscriptionData.subscriptions);
+          setDocuments(documentData.documents);
         }
       } catch (requestError) {
         if (isMounted) {
@@ -205,6 +255,8 @@ export default function DashboardPage() {
       const days = daysUntil(subscription.nextRenewalDate);
       return days >= 0 && days <= 30;
     });
+    const expiredDocuments = documents.filter((document) => document.status === "expired");
+    const expiringSoonDocuments = documents.filter((document) => document.status === "expiring_soon");
 
     return {
       openBillTotal: openBills.reduce((total, bill) => total + Number(bill.amount || 0), 0),
@@ -213,9 +265,11 @@ export default function DashboardPage() {
         0
       ),
       dueSoonCount: dueSoonBills.length,
-      renewalSoonCount: renewalSoonSubscriptions.length
+      renewalSoonCount: renewalSoonSubscriptions.length,
+      expiredDocumentCount: expiredDocuments.length,
+      expiringSoonDocumentCount: expiringSoonDocuments.length
     };
-  }, [bills, subscriptions]);
+  }, [bills, subscriptions, documents]);
 
   function updateBillForm(event) {
     setBillForm((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -223,6 +277,10 @@ export default function DashboardPage() {
 
   function updateSubscriptionForm(event) {
     setSubscriptionForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  }
+
+  function updateDocumentForm(event) {
+    setDocumentForm((current) => ({ ...current, [event.target.name]: event.target.value }));
   }
 
   async function submitBill(event) {
@@ -233,11 +291,7 @@ export default function DashboardPage() {
     try {
       const path = editingBillId ? `/api/bills/${editingBillId}` : "/api/bills";
       const method = editingBillId ? "PUT" : "POST";
-      const data = await apiRequest(path, {
-        method,
-        token,
-        body: billForm
-      });
+      const data = await apiRequest(path, { method, token, body: billForm });
 
       setBills((current) => {
         if (editingBillId) {
@@ -263,11 +317,7 @@ export default function DashboardPage() {
     try {
       const path = editingSubscriptionId ? `/api/subscriptions/${editingSubscriptionId}` : "/api/subscriptions";
       const method = editingSubscriptionId ? "PUT" : "POST";
-      const data = await apiRequest(path, {
-        method,
-        token,
-        body: subscriptionForm
-      });
+      const data = await apiRequest(path, { method, token, body: subscriptionForm });
 
       setSubscriptions((current) => {
         if (editingSubscriptionId) {
@@ -286,6 +336,34 @@ export default function DashboardPage() {
       setError(requestError.message);
     } finally {
       setIsSavingSubscription(false);
+    }
+  }
+
+  async function submitDocument(event) {
+    event.preventDefault();
+    setIsSavingDocument(true);
+    setError("");
+
+    try {
+      const path = editingDocumentId ? `/api/documents/${editingDocumentId}` : "/api/documents";
+      const method = editingDocumentId ? "PUT" : "POST";
+      const data = await apiRequest(path, { method, token, body: documentForm });
+
+      setDocuments((current) => {
+        if (editingDocumentId) {
+          return sortDocuments(
+            current.map((document) => (document.id === editingDocumentId ? data.document : document))
+          );
+        }
+
+        return sortDocuments([data.document, ...current]);
+      });
+      setDocumentForm(documentDefaults);
+      setEditingDocumentId(null);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsSavingDocument(false);
     }
   }
 
@@ -313,6 +391,18 @@ export default function DashboardPage() {
       category: subscription.category,
       status: subscription.status,
       notes: subscription.notes || ""
+    });
+  }
+
+  function editDocument(document) {
+    setActivePanel("documents");
+    setEditingDocumentId(document.id);
+    setDocumentForm({
+      name: document.name,
+      documentType: document.documentType,
+      expiryDate: document.expiryDate,
+      reminderDaysBefore: String(document.reminderDaysBefore),
+      notes: document.notes || ""
     });
   }
 
@@ -354,6 +444,25 @@ export default function DashboardPage() {
     }
   }
 
+  async function deleteDocument(id) {
+    if (!window.confirm("Delete this document?")) {
+      return;
+    }
+
+    setError("");
+
+    try {
+      await apiRequest(`/api/documents/${id}`, { method: "DELETE", token });
+      setDocuments((current) => current.filter((document) => document.id !== id));
+      if (editingDocumentId === id) {
+        setEditingDocumentId(null);
+        setDocumentForm(documentDefaults);
+      }
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
   const profileRows = [
     { label: "Name", value: user?.name },
     { label: "Email", value: user?.email },
@@ -370,7 +479,9 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-base font-black leading-none">Life Admin OS</p>
-              <p className="mt-1 text-xs font-bold uppercase text-black/50">Bills and Subscriptions</p>
+              <p className="mt-1 text-xs font-bold uppercase text-black/50">
+                Bills, Subscriptions, and Documents
+              </p>
             </div>
           </div>
 
@@ -387,18 +498,19 @@ export default function DashboardPage() {
       <section className="mx-auto max-w-7xl px-5 py-8">
         <div className="mb-7 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <p className="text-sm font-black uppercase text-teal">Phase 2</p>
+            <p className="text-sm font-black uppercase text-teal">Phase 3</p>
             <h1 className="mt-2 text-4xl font-black leading-tight sm:text-5xl">
-              Manual payment tracking
+              Life-admin tracking
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-black/60">
-              Add bills and subscriptions manually, keep status current, and see what needs attention next.
+              Track recurring payments and document expiry dates, then see what needs attention next.
             </p>
           </div>
           <div className="flex rounded-app border border-black/10 bg-white p-1 shadow-soft">
             {[
               ["bills", "Bills"],
-              ["subscriptions", "Subscriptions"]
+              ["subscriptions", "Subscriptions"],
+              ["documents", "Documents"]
             ].map(([value, label]) => (
               <button
                 className={`h-10 rounded-app px-4 text-sm font-black transition ${
@@ -420,7 +532,7 @@ export default function DashboardPage() {
           </div>
         ) : null}
 
-        <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
             <p className="text-sm font-black uppercase text-black/45">Open bills</p>
             <p className="mt-3 text-3xl font-black">{formatCurrency(summary.openBillTotal)}</p>
@@ -436,6 +548,12 @@ export default function DashboardPage() {
           <article className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
             <p className="text-sm font-black uppercase text-black/45">Renewals soon</p>
             <p className="mt-3 text-3xl font-black">{summary.renewalSoonCount}</p>
+          </article>
+          <article className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
+            <p className="text-sm font-black uppercase text-black/45">Documents attention</p>
+            <p className="mt-3 text-3xl font-black">
+              {summary.expiredDocumentCount + summary.expiringSoonDocumentCount}
+            </p>
           </article>
         </div>
 
@@ -525,7 +643,9 @@ export default function DashboardPage() {
                   </button>
                 </form>
               </section>
-            ) : (
+            ) : null}
+
+            {activePanel === "subscriptions" ? (
               <section className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
@@ -630,7 +750,85 @@ export default function DashboardPage() {
                   </button>
                 </form>
               </section>
-            )}
+            ) : null}
+
+            {activePanel === "documents" ? (
+              <section className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
+                <div className="mb-5 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-black uppercase text-black/45">
+                      {editingDocumentId ? "Edit Document" : "Add Document"}
+                    </p>
+                    <h2 className="mt-1 text-2xl font-black">Document details</h2>
+                  </div>
+                  {editingDocumentId ? (
+                    <button
+                      className="rounded-app border border-black/10 px-3 py-2 text-xs font-black"
+                      onClick={() => {
+                        setEditingDocumentId(null);
+                        setDocumentForm(documentDefaults);
+                      }}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                  ) : null}
+                </div>
+
+                <form className="grid gap-4 sm:grid-cols-2" onSubmit={submitDocument}>
+                  <TextInput
+                    label="Document name"
+                    name="name"
+                    onChange={updateDocumentForm}
+                    placeholder="Passport"
+                    required
+                    type="text"
+                    value={documentForm.name}
+                  />
+                  <TextInput
+                    label="Document type"
+                    name="documentType"
+                    onChange={updateDocumentForm}
+                    placeholder="Passport"
+                    required
+                    type="text"
+                    value={documentForm.documentType}
+                  />
+                  <TextInput
+                    label="Expiry date"
+                    name="expiryDate"
+                    onChange={updateDocumentForm}
+                    required
+                    type="date"
+                    value={documentForm.expiryDate}
+                  />
+                  <TextInput
+                    label="Reminder days before"
+                    min="0"
+                    name="reminderDaysBefore"
+                    onChange={updateDocumentForm}
+                    required
+                    step="1"
+                    type="number"
+                    value={documentForm.reminderDaysBefore}
+                  />
+                  <NotesInput
+                    label="Notes"
+                    name="notes"
+                    onChange={updateDocumentForm}
+                    placeholder="Optional renewal instructions or document notes"
+                    value={documentForm.notes}
+                  />
+                  <button
+                    className="h-11 rounded-app bg-moss px-4 text-sm font-black text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-2"
+                    disabled={isSavingDocument}
+                    type="submit"
+                  >
+                    {isSavingDocument ? "Saving..." : editingDocumentId ? "Update Document" : "Add Document"}
+                  </button>
+                </form>
+              </section>
+            ) : null}
 
             <aside className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
               <p className="text-sm font-black uppercase text-black/45">Profile</p>
@@ -677,7 +875,7 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <p className="mt-2 text-sm leading-6 text-black/60">
-                            {bill.category} | Due {formatDate(bill.dueDate)} | {daysUntil(bill.dueDate)} days
+                            {bill.category} | Due {formatDate(bill.dueDate)} | {relativeDateLabel(bill.dueDate)}
                           </p>
                           {bill.notes ? <p className="mt-2 text-sm leading-6 text-black/60">{bill.notes}</p> : null}
                         </div>
@@ -744,7 +942,7 @@ export default function DashboardPage() {
                           </div>
                           <p className="mt-2 text-sm leading-6 text-black/60">
                             {subscription.category} | Renews {formatDate(subscription.nextRenewalDate)} |{" "}
-                            {daysUntil(subscription.nextRenewalDate)} days
+                            {relativeDateLabel(subscription.nextRenewalDate)}
                           </p>
                           {subscription.notes ? (
                             <p className="mt-2 text-sm leading-6 text-black/60">{subscription.notes}</p>
@@ -771,6 +969,74 @@ export default function DashboardPage() {
                               Delete
                             </button>
                           </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-app border border-black/10 bg-white p-5 shadow-soft">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-black uppercase text-black/45">Documents</p>
+                  <h2 className="mt-1 text-2xl font-black">Expiry tracking</h2>
+                </div>
+                <span className="rounded-full bg-teal/10 px-3 py-1 text-xs font-black text-teal">
+                  {documents.length} total
+                </span>
+              </div>
+
+              {isLoading ? (
+                <p className="rounded-app bg-sage p-4 text-sm font-bold text-black/60">Loading documents...</p>
+              ) : documents.length === 0 ? (
+                <EmptyState
+                  title="No documents yet"
+                  body="Add passports, licenses, visas, insurance policies, registrations, or certifications."
+                />
+              ) : (
+                <div className="grid gap-3">
+                  {documents.map((document) => (
+                    <article key={document.id} className="rounded-app border border-black/10 bg-sage p-4">
+                      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-lg font-black">{document.name}</h3>
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-black ${documentStatusClass(
+                                document.status
+                              )}`}
+                            >
+                              {readableStatus(document.status)}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-black/60">
+                            {document.documentType} | Expires {formatDate(document.expiryDate)} |{" "}
+                            {relativeDateLabel(document.expiryDate)}
+                          </p>
+                          <p className="mt-1 text-xs font-black uppercase text-black/45">
+                            Reminder {document.reminderDaysBefore} days before
+                          </p>
+                          {document.notes ? (
+                            <p className="mt-2 text-sm leading-6 text-black/60">{document.notes}</p>
+                          ) : null}
+                        </div>
+                        <div className="flex gap-2 md:justify-end">
+                          <button
+                            className="h-9 rounded-app border border-black/10 bg-white px-3 text-xs font-black"
+                            onClick={() => editDocument(document)}
+                            type="button"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="h-9 rounded-app border border-coral/20 bg-coral/10 px-3 text-xs font-black text-coral"
+                            onClick={() => deleteDocument(document.id)}
+                            type="button"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </article>
