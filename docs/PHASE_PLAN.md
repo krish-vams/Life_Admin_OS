@@ -217,7 +217,27 @@ Success criteria:
 - Repeated requests are limited with a clear 429 response.
 - Operational failures are logged without leaking system details to users.
 
-## Phase 12: Automation And Insights
+## Phase 12: Testing
+
+Goal: Ensure the application works correctly and does not break when new features are added.
+
+Scope:
+
+- Backend unit tests for validation helpers and Gmail email parsing logic.
+- Backend API tests for bill endpoints and analytics summaries.
+- Backend integration test for reminder generation across bills, subscriptions, and documents.
+- Frontend unit test for monthly subscription cost calculations.
+- Root, backend, and frontend test scripts.
+- Testing guide with automated commands and a manual showcase flow.
+
+Success criteria:
+
+- The full test suite can run with one command.
+- Core backend validation and API behavior have automated coverage.
+- Reminder generation behavior has integration coverage.
+- Frontend business calculations have automated coverage.
+
+## Phase 13: Automation And Insights
 
 Goal: Add higher-value personal finance and organization insights.
 

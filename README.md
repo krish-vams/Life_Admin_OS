@@ -2,11 +2,11 @@
 
 Life Admin OS is a personal productivity dashboard for tracking bills, subscriptions, document renewals, reminders, and recurring responsibilities in one place.
 
-The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, secure document uploads, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, Google Calendar sync, rate limiting, structured logging, and stronger backend validation. Users can register, log in, manage recurring payments, track document expirations, store important files, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
+The application currently supports authentication, manual bill and subscription tracking, document expiry tracking, secure document uploads, a polished dashboard overview, in-app reminders, background jobs, Gmail-detected suggestions, analytics, email reminders, Google Calendar sync, rate limiting, structured logging, stronger backend validation, and automated tests. Users can register, log in, manage recurring payments, track document expirations, store important files, receive reminders outside the app, connect Google, review detected bills or subscriptions, and understand recurring spending patterns.
 
 ## Current Phase
 
-Phase 11: Security, Validation, and Reliability
+Phase 12: Testing
 
 - React frontend with protected routing.
 - Express backend with auth APIs.
@@ -25,6 +25,9 @@ Phase 11: Security, Validation, and Reliability
 - Global API rate limiting with configurable request windows.
 - Clean API error responses with structured server-side logs.
 - Failed login, blocked auth, Gmail failure, and background job failure logging.
+- Backend unit, API, and integration tests.
+- Frontend unit tests for subscription cost calculations.
+- Test scripts for the full repo, backend, and frontend.
 - Dedicated pages for `/dashboard`, `/analytics`, `/bills`, `/subscriptions`, `/documents`, and `/settings`.
 - Dashboard summaries for total subscriptions, monthly subscription spend, upcoming bills, and expiring documents.
 - Upcoming bills, subscription renewals, expiring documents, notifications, search, and a simple subscription cost chart.
@@ -87,6 +90,12 @@ Then visit:
 http://localhost:5173
 ```
 
+Run tests:
+
+```bash
+npm test
+```
+
 ## API Routes
 
 - `POST /api/auth/register`
@@ -130,3 +139,4 @@ http://localhost:5173
 
 - [Project context](docs/PROJECT_CONTEXT.md)
 - [Phase plan](docs/PHASE_PLAN.md)
+- [Testing guide](docs/TESTING.md)

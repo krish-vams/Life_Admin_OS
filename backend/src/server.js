@@ -19,6 +19,10 @@ if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET is required");
 }
 
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is required");
+}
+
 const app = express();
 const port = process.env.PORT || 4000;
 

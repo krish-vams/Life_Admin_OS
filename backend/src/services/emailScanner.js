@@ -11,12 +11,12 @@ function toDateString(value) {
   return new Date(Number(value || Date.now())).toISOString().slice(0, 10);
 }
 
-function parseAmount(text) {
+export function parseAmount(text) {
   const match = text.match(/\$\s?(\d{1,6}(?:,\d{3})*(?:\.\d{2})?)/);
   return match ? Number(match[1].replaceAll(",", "")) : null;
 }
 
-function inferType(text) {
+export function inferType(text) {
   const normalized = text.toLowerCase();
 
   if (/(subscription|renewal|renews|membership|premium)/.test(normalized)) {
@@ -26,7 +26,7 @@ function inferType(text) {
   return "bill";
 }
 
-function inferName(message) {
+export function inferName(message) {
   const fromHeader = message.payload?.headers?.find((header) => header.name.toLowerCase() === "from")?.value;
   const fromName = fromHeader?.split("<")[0]?.replaceAll("\"", "").trim();
 
@@ -37,7 +37,7 @@ function inferName(message) {
   return "Detected item";
 }
 
-function confidenceFor(text, amount) {
+export function confidenceFor(text, amount) {
   const normalized = text.toLowerCase();
   let score = 0.45;
 
@@ -134,4 +134,3 @@ export async function scanUserEmail(userId) {
 
   return detectedCount;
 }
-

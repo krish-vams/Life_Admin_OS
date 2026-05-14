@@ -50,7 +50,7 @@ function nextRenewalPrediction(subscription) {
 
 router.use(requireAuth);
 
-router.get("/summary", async (req, res, next) => {
+export async function getAnalyticsSummary(req, res, next) {
   try {
     const [subscriptionsResult, billsResult] = await Promise.all([
       query(
@@ -137,7 +137,8 @@ router.get("/summary", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
+
+router.get("/summary", getAnalyticsSummary);
 
 export default router;
-

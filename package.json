@@ -8,7 +8,8 @@
     "worker": "npm --prefix backend run worker",
     "dev:frontend": "npm --prefix frontend run dev",
     "start:backend": "npm --prefix backend start",
-    "build:frontend": "npm --prefix frontend run build"
+    "build:frontend": "npm --prefix frontend run build",
+    "test": "npm --prefix backend test && npm --prefix frontend test"
   },
   "engines": {
     "node": ">=20"

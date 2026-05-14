@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { API_BASE_URL, apiRequest } from "../api/client.js";
 import { useAuth } from "../state/AuthContext.jsx";
+import { monthlySubscriptionAmount } from "../utils/finance.js";
 
 const billDefaults = {
   name: "",
@@ -137,21 +138,6 @@ function documentStatusClass(status) {
   }
 
   return "bg-teal/10 text-teal";
-}
-
-function monthlySubscriptionAmount(subscription) {
-  const amount = Number(subscription.amount || 0);
-
-  switch (subscription.billingCycle) {
-    case "weekly":
-      return amount * 4.33;
-    case "quarterly":
-      return amount / 3;
-    case "yearly":
-      return amount / 12;
-    default:
-      return amount;
-  }
 }
 
 function sortBills(items) {

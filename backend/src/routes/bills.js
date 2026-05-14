@@ -83,7 +83,7 @@ function validateBill(input) {
 
 router.use(requireAuth);
 
-router.get("/", async (req, res, next) => {
+export async function listBills(req, res, next) {
   try {
     const result = await query(
       `SELECT id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at
@@ -97,9 +97,9 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
 
-router.get("/:id", async (req, res, next) => {
+export async function getBill(req, res, next) {
   try {
     const result = await query(
       `SELECT id, user_id, name, amount, due_date, reminder_days_before, category, status, notes, created_at, updated_at
@@ -116,9 +116,9 @@ router.get("/:id", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
 
-router.post("/", async (req, res, next) => {
+export async function createBill(req, res, next) {
   try {
     const { values, errors } = validateBill(req.body);
 
@@ -146,9 +146,9 @@ router.post("/", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
 
-router.put("/:id", async (req, res, next) => {
+export async function updateBill(req, res, next) {
   try {
     const { values, errors } = validateBill(req.body);
 
@@ -182,9 +182,9 @@ router.put("/:id", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
 
-router.delete("/:id", async (req, res, next) => {
+export async function deleteBill(req, res, next) {
   try {
     const result = await query("DELETE FROM bills WHERE id = $1 AND user_id = $2", [req.params.id, req.user.sub]);
 
@@ -196,6 +196,12 @@ router.delete("/:id", async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-});
+}
+
+router.get("/", listBills);
+router.get("/:id", getBill);
+router.post("/", createBill);
+router.put("/:id", updateBill);
+router.delete("/:id", deleteBill);
 
 export default router;
